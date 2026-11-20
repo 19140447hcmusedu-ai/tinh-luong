@@ -615,7 +615,7 @@
   <div class="quickbar">
     <span>Điền nhanh :</span>
     <button class="chip" id="btnAutoFill" onclick="quickAutoFillCycle()">+ Tự động điền ca kỳ công (48h/tuần)</button>
-    <button class="chip chip-undo" id="btnUndoFill" onclick="undoLastAutoFill()" disabled title="Hoàn tác các ngày vừa được tự động điền">↺ Hoàn tác lần fill gần nhất</button>
+    <button class="chip chip-undo" id="btnUndoFill" onclick="undoLastAutoFill()" disabled title="Hoàn tác các ngày vừa được tự động điền">↺ Hoàn tác lần điền gần nhất</button>
   </div>
 
   <div class="calendar-wrapper">
@@ -1189,8 +1189,8 @@ function syncUndoButtonState() {
   const count = Array.isArray(state.lastAutoFillDates) ? state.lastAutoFillDates.length : 0;
   btn.disabled = count === 0;
   btn.textContent = count > 0
-    ? `↺ Hoàn tác lần fill (${count} ngày)`
-    : '↺ Hoàn tác lần fill gần nhất';
+    ? `↺ Hoàn tác lần điền (${count} ngày)`
+    : '↺ Hoàn tác lần điền gần nhất';
 }
 
 function quickAutoFillCycle() {
