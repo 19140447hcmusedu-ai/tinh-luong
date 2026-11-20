@@ -1014,6 +1014,7 @@ function renderAll() {
   let count12Day = 0, count12Night = 0, count8Night = 0, count12ODNight = 0, count12ONight = 0;
   let totalOTHours = 0;
   let sumNonTConvertedHours = 0;
+  let stateMutated = false;
 
   // Build calendar HTML
   const dayNames = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
@@ -1025,7 +1026,18 @@ function renderAll() {
     const inCycle = (d >= startDate && d <= endDate);
     const isSun = (d.getDay() === 0);
     const isToday = (iso === todayStr);
-    const selectedCode = inCycle ? (state.shiftsByDate[iso] || '') : '';
+
+    // Options HTML: Sunday only shows [8CN] and [12CN] shifts; non-Sunday hides CN shifts
+    const availableShifts = isSun
+      ? SHIFTS.filter(s => s.code.includes('[8CN]') || s.code.includes('[12CN]'))
+      : SHIFTS.filter(s => s.day_type !== 'CN' && !s.code.includes('[8CN]') && !s.code.includes('[12CN]'));
+
+    let selectedCode = inCycle ? (state.shiftsByDate[iso] || '') : '';
+    if (inCycle && selectedCode && !availableShifts.some(s => s.code === selectedCode)) {
+      delete state.shiftsByDate[iso];
+      selectedCode = '';
+      stateMutated = true;
+    }
     const shiftObj = SHIFT_MAP[selectedCode];
 
     // Next day's shift code (seamless across Saturday -> Sunday!)
@@ -1073,10 +1085,6 @@ function renderAll() {
       }
     }
 
-    // Options HTML: Sunday only shows [8CN] and [12CN] shifts
-    const availableShifts = isSun
-      ? SHIFTS.filter(s => s.code.includes('[8CN]') || s.code.includes('[12CN]'))
-      : SHIFTS;
     let opts = `<option value="">-- Nghỉ / Trống --</option>`;
     availableShifts.forEach(s => {
       const sel = (s.code === selectedCode) ? 'selected' : '';
@@ -1112,6 +1120,9 @@ function renderAll() {
         ${valHtml}
       </div>
     `;
+  }
+  if (stateMutated) {
+    saveState();
   }
   document.getElementById('calendarGrid').innerHTML = html;
   syncUndoButtonState();
