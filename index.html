@@ -6,47 +6,72 @@
 <title>Chấm công & Tính lương</title>
 <style>
   :root {
-    --bg: #0f172a;
-    --surface: #1e293b;
-    --surface2: #273549;
+    --bg: #0b1120;
+    --surface: #151f32;
+    --surface2: #1e293b;
+    --input-bg: #0f172a;
     --border: #334155;
-    --text: #f1f5f9;
+    --border-subtle: rgba(148, 163, 184, 0.16);
+    --text: #f8fafc;
     --text-muted: #94a3b8;
     --primary: #3b82f6;
     --primary-hover: #2563eb;
     --accent: #10b981;
     --warning: #f59e0b;
     --danger: #ef4444;
-    --purple: #8b5cf6;
+    --purple: #a78bfa;
     --title-color: #ffffff;
-    --heading-color: #ffffff;
-    --input-text: #ffffff;
-    --select-text: #ffffff;
-    --row-text: #cbd5e1;
-    --badge-text: #e2e8f0;
+    --heading-color: #f8fafc;
+    --input-text: #f8fafc;
+    --select-text: #f8fafc;
+    --row-text: #e2e8f0;
+    --badge-text: #f1f5f9;
     --header-text: #cbd5e1;
-    --chip-text: #e2e8f0;
-    --btn-text: #ffffff;
-    --hover-surface: #334155;
+    --chip-text: #f1f5f9;
+    --btn-text: #f8fafc;
+    --hover-surface: #283548;
     --day-val-money: #38bdf8;
-    --banner-bg: linear-gradient(135deg, #1e3a8a, #0f766e);
+    --day-val-hours: #34d399;
+    --ot-color: #fbbf24;
+    --night-color: #c084fc;
+    --deduct-color: #f87171;
+    --allow-color: #34d399;
+    --sunday-text: #f87171;
+    --sunday-bg: rgba(239, 68, 68, 0.06);
+    --outrange-bg: rgba(11, 17, 32, 0.72);
+    --tag-t-bg: rgba(59, 130, 246, 0.22);
+    --tag-t-text: #93c5fd;
+    --tag-o-bg: rgba(245, 158, 11, 0.22);
+    --tag-o-text: #fcd34d;
+    --tag-cn-bg: rgba(239, 68, 68, 0.22);
+    --tag-cn-text: #fca5a5;
+    --tag-l-bg: rgba(139, 92, 246, 0.26);
+    --tag-l-text: #ddd6fe;
+    --tag-off-bg: rgba(148, 163, 184, 0.16);
+    --tag-off-text: #94a3b8;
+    --cur-month-text: #93c5fd;
+    --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    --popover-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+    --banner-bg: linear-gradient(135deg, #1d4ed8, #0f766e);
     --banner-lbl: #e0f2fe;
     --banner-amt: #ffffff;
-    --banner-border: rgba(255,255,255,0.18);
+    --banner-border: rgba(255,255,255,0.2);
   }
   body.light-theme {
-    --bg: #f1f5f9;
+    --bg: #eef2f6;
     --surface: #ffffff;
-    --surface2: #f8fafc;
+    --surface2: #f1f5f9;
+    --input-bg: #ffffff;
     --border: #cbd5e1;
+    --border-subtle: rgba(15, 23, 42, 0.09);
     --text: #0f172a;
     --text-muted: #475569;
     --primary: #2563eb;
     --primary-hover: #1d4ed8;
     --accent: #059669;
-    --warning: #d97706;
+    --warning: #b45309;
     --danger: #dc2626;
-    --purple: #7c3aed;
+    --purple: #6d28d9;
     --title-color: #0f172a;
     --heading-color: #0f172a;
     --input-text: #0f172a;
@@ -57,11 +82,32 @@
     --chip-text: #1e293b;
     --btn-text: #0f172a;
     --hover-surface: #e2e8f0;
-    --day-val-money: #0284c7;
-    --banner-bg: linear-gradient(135deg, #1d4ed8, #047857);
+    --day-val-money: #0369a1;
+    --day-val-hours: #047857;
+    --ot-color: #b45309;
+    --night-color: #6d28d9;
+    --deduct-color: #dc2626;
+    --allow-color: #047857;
+    --sunday-text: #dc2626;
+    --sunday-bg: rgba(220, 38, 38, 0.045);
+    --outrange-bg: #e2e8f0;
+    --tag-t-bg: #dbeafe;
+    --tag-t-text: #1d4ed8;
+    --tag-o-bg: #fef3c7;
+    --tag-o-text: #b45309;
+    --tag-cn-bg: #fee2e2;
+    --tag-cn-text: #b91c1c;
+    --tag-l-bg: #ede9fe;
+    --tag-l-text: #6d28d9;
+    --tag-off-bg: #e2e8f0;
+    --tag-off-text: #475569;
+    --cur-month-text: #1d4ed8;
+    --card-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+    --popover-shadow: 0 14px 32px rgba(15, 23, 42, 0.16);
+    --banner-bg: linear-gradient(135deg, #1e40af, #047857);
     --banner-lbl: #f0f9ff;
     --banner-amt: #ffffff;
-    --banner-border: rgba(255,255,255,0.25);
+    --banner-border: rgba(255,255,255,0.28);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
   body { background: var(--bg); color: var(--text); padding: 16px; line-height: 1.4; }
@@ -83,23 +129,23 @@
   }
   .control-box label { font-size: 0.82rem; color: var(--text-muted); font-weight: 600; }
   input[type="month"], select {
-    background: var(--bg); color: var(--title-color); border: 1px solid var(--border);
+    background: var(--input-bg); color: var(--input-text); border: 1px solid var(--border);
     padding: 5px 8px; border-radius: 6px; font-size: 0.9rem; outline: none;
   }
 
   /* Custom Vietnamese Month/Year Picker */
   .month-picker-wrap { position: relative; display: inline-flex; align-items: center; }
   .month-trigger {
-    background: var(--bg); color: var(--title-color); border: 1px solid var(--border);
+    background: var(--input-bg); color: var(--input-text); border: 1px solid var(--border);
     padding: 5px 10px; border-radius: 6px; font-size: 0.88rem; font-weight: 600;
     cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
     min-width: 158px; justify-content: space-between; transition: border-color 0.15s, background 0.15s;
   }
-  .month-trigger:hover, .month-trigger.open { border-color: var(--primary); background: #162033; }
+  .month-trigger:hover, .month-trigger.open { border-color: var(--primary); background: var(--hover-surface); }
   .month-popover {
     display: none; position: absolute; top: calc(100% + 8px); right: 0;
     width: 272px; background: var(--surface); border: 1px solid var(--border);
-    border-radius: 12px; padding: 12px; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+    border-radius: 12px; padding: 12px; box-shadow: var(--popover-shadow);
     z-index: 500;
   }
   .month-popover.open { display: block; }
@@ -123,8 +169,8 @@
     cursor: pointer; transition: 0.12s; text-align: center;
   }
   .mp-month-btn:hover { border-color: var(--primary); color: var(--title-color); }
-  .mp-month-btn.active { background: var(--primary); color: var(--title-color); border-color: var(--primary); }
-  .mp-month-btn.current-m:not(.active) { border-color: rgba(59, 130, 246, 0.45); color: #93c5fd; }
+  .mp-month-btn.active { background: var(--primary); color: #ffffff; border-color: var(--primary); }
+  .mp-month-btn.current-m:not(.active) { border-color: var(--primary); color: var(--cur-month-text); }
   .mp-footer {
     margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border);
     display: flex; justify-content: space-between; gap: 8px;
@@ -136,12 +182,13 @@
   .mp-quick-btn:hover { background: var(--hover-surface); color: var(--title-color); }
   
   /* Segmented View Switch */
-  .segmented { display: flex; background: var(--bg); border-radius: 8px; padding: 3px; border: 1px solid var(--border); }
+  .segmented { display: flex; background: var(--surface2); border-radius: 8px; padding: 3px; border: 1px solid var(--border); }
   .segmented button {
     background: transparent; border: none; color: var(--text-muted); padding: 5px 12px;
     border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: 0.15s;
   }
-  .segmented button.active { background: var(--primary); color: var(--title-color); }
+  .segmented button:hover:not(.active) { color: var(--text); }
+  .segmented button.active { background: var(--primary); color: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
   
   .btn {
     background: var(--surface2); color: var(--title-color); border: 1px solid var(--border);
@@ -151,9 +198,16 @@
   .btn:hover { background: var(--hover-surface); }
   .btn-primary { background: var(--primary); border-color: var(--primary); color: #ffffff; }
   .btn-primary:hover { background: var(--primary-hover); }
-  .btn-danger { color: #fca5a5; border-color: #7f1d1d; }
+  .btn-danger { color: #fca5a5; border-color: #7f1d1d; background: rgba(127, 29, 29, 0.22); }
+  .btn-danger:hover { background: #dc2626; border-color: #dc2626; color: #ffffff; }
   body.light-theme .btn-danger { color: #b91c1c; border-color: #fca5a5; background: #fef2f2; }
-  .btn-danger:hover { background: #7f1d1d; color: var(--title-color); }
+  body.light-theme .btn-danger:hover { background: #dc2626; border-color: #dc2626; color: #ffffff; }
+
+  .btn-icon {
+    width: 34px; height: 34px; padding: 0; justify-content: center;
+    border-radius: 8px; flex-shrink: 0; color: var(--text);
+  }
+  .btn-icon svg { width: 17px; height: 17px; display: block; }
 
   /* Quick Fill Toolbar */
   .quickbar {
@@ -182,34 +236,35 @@
     font-weight: 700; font-size: 0.85rem; border-bottom: 1px solid var(--border);
     border-right: 1px solid var(--border); color: var(--header-text);
   }
-  .cal-header:first-child { color: #f87171; }
+  .cal-header:first-child { color: var(--sunday-text); }
   .cal-header:last-child { border-right: none; }
   
   .day-cell {
     min-height: 126px; padding: 8px; border-right: 1px solid var(--border);
     border-bottom: 1px solid var(--border); display: flex; flex-direction: column;
     justify-content: space-between; transition: background 0.15s; position: relative;
+    background: var(--surface);
   }
   .day-cell:nth-child(7n) { border-right: none; }
-  .day-cell.out-range { background: rgba(15, 23, 42, 0.65); opacity: 0.45; pointer-events: none; }
-  .day-cell.is-sunday { background: rgba(239, 68, 68, 0.05); }
+  .day-cell.out-range { background: var(--outrange-bg); opacity: 0.55; pointer-events: none; }
+  .day-cell.is-sunday { background: var(--sunday-bg); }
   .day-cell.is-today { box-shadow: inset 0 0 0 2px var(--primary); }
   
   .day-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
   .date-badge { font-size: 0.85rem; font-weight: 700; color: var(--badge-text); }
-  .day-cell.is-sunday .date-badge { color: #f87171; }
+  .day-cell.is-sunday .date-badge { color: var(--sunday-text); }
   .tag-type {
     font-size: 0.7rem; font-weight: 700; padding: 2px 6px; border-radius: 4px;
     background: var(--hover-surface); color: var(--header-text);
   }
-  .tag-T { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
-  .tag-O { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
-  .tag-CN { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
-  .tag-L { background: rgba(139, 92, 246, 0.25); color: #c4b5fd; }
-  .tag-OFF { background: rgba(148, 163, 184, 0.15); color: #94a3b8; }
+  .tag-T { background: var(--tag-t-bg); color: var(--tag-t-text); }
+  .tag-O { background: var(--tag-o-bg); color: var(--tag-o-text); }
+  .tag-CN { background: var(--tag-cn-bg); color: var(--tag-cn-text); }
+  .tag-L { background: var(--tag-l-bg); color: var(--tag-l-text); }
+  .tag-OFF { background: var(--tag-off-bg); color: var(--tag-off-text); }
 
   .shift-select {
-    width: 100%; background: var(--bg); color: var(--title-color); border: 1px solid var(--border);
+    width: 100%; background: var(--input-bg); color: var(--select-text); border: 1px solid var(--border);
     border-radius: 6px; padding: 5px 6px; font-size: 0.78rem; cursor: pointer;
     margin-bottom: 6px;
   }
@@ -221,7 +276,7 @@
   }
   .day-val {
     margin-top: 6px; padding-top: 5px; border-top: 1px dashed var(--border);
-    font-size: 0.85rem; font-weight: 700; text-align: right; color: var(--accent);
+    font-size: 0.85rem; font-weight: 700; text-align: right; color: var(--day-val-hours);
   }
   .day-val.money-mode { color: var(--day-val-money); }
   .day-val.empty { color: var(--text-muted); font-weight: 400; font-size: 0.78rem; }
@@ -240,8 +295,9 @@
   
   .card {
     background: var(--surface); border-radius: 12px; border: 1px solid var(--border);
-    padding: 18px; display: flex; flex-direction: column;
+    padding: 18px; display: flex; flex-direction: column; box-shadow: var(--card-shadow);
   }
+  .topbar, .quickbar, .calendar-wrapper { box-shadow: var(--card-shadow); }
   .card h2 {
     font-size: 1rem; font-weight: 700; margin-bottom: 10px; padding-bottom: 10px;
     border-bottom: 1px solid rgba(148, 163, 184, 0.28); color: var(--title-color);
@@ -266,7 +322,7 @@
   .stat-value { font-weight: 700; font-variant-numeric: tabular-nums; }
   
   .num-input {
-    width: 145px; background: var(--bg); color: var(--title-color); border: 1px solid var(--primary);
+    width: 145px; background: var(--input-bg); color: var(--input-text); border: 1px solid var(--primary);
     border-radius: 6px; padding: 6px 10px; text-align: right; font-weight: 700;
     font-size: 0.92rem;
   }
@@ -290,12 +346,22 @@
     align-items: center; border: 1px solid var(--banner-border);
   }
   .total-banner .lbl { font-size: 1rem; font-weight: 700; color: var(--banner-lbl); }
-  .total-banner .amt { font-size: 1.55rem; font-weight: 800; color: var(--title-color); font-variant-numeric: tabular-nums; }
+  .total-banner .amt { font-size: 1.55rem; font-weight: 800; color: var(--banner-amt); font-variant-numeric: tabular-nums; }
 
   .toast {
-    position: fixed; bottom: 20px; right: 20px; background: #10b981; color: #064e3b;
-    font-weight: 700; padding: 10px 16px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    position: fixed; bottom: 20px; right: 20px; background: #059669; color: #ffffff;
+    font-weight: 600; font-size: 0.85rem; padding: 10px 16px; border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.35);
     opacity: 0; transform: translateY(10px); transition: 0.25s; pointer-events: none; z-index: 999;
+  }
+  .save-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 0.74rem; font-weight: 600; color: var(--accent);
+    background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3);
+    padding: 2px 8px; border-radius: 999px; margin-left: 8px; vertical-align: middle;
+  }
+  body.light-theme .save-badge {
+    background: #ecfdf5; border-color: #a7f3d0;
   }
   .toast.show { opacity: 1; transform: translateY(0); }
 
@@ -351,11 +417,16 @@
       font-size: 0.82rem;
       text-align: center;
     }
-    .controls .btn {
+    .controls .btn:not(.btn-icon) {
       width: 100%;
       justify-content: center;
       padding: 9px 12px;
       font-size: 0.86rem;
+    }
+    .controls .btn-icon {
+      width: 38px;
+      height: 38px;
+      align-self: flex-end;
     }
     .quickbar {
       padding: 10px 12px;
@@ -460,8 +531,8 @@
 <div class="container">
   <div class="topbar">
     <div class="title-group">
-      <h1>Tính Lương</h1>
-      <p id="cycleLabel">Chu kỳ lương: 26/10/2026 – 25/11/2026 (Tự động lưu trên trình duyệt)</p>
+      <h1>Tính Lương <span class="save-badge" id="saveStatusBadge" title="Mọi thay đổi tự động lưu vào trình duyệt">● Tự động lưu</span></h1>
+      <p id="cycleLabel">Chu kỳ lương: 26/10/2026 – 25/11/2026</p>
     </div>
     <div class="controls">
       <div class="control-box">
@@ -489,7 +560,7 @@
         <button id="btnViewMoney" class="active" onclick="setViewMode('Tiền')">Xem Tiền (VNĐ)</button>
         <button id="btnViewHours" onclick="setViewMode('Giờ công')">Xem Giờ quy đổi</button>
       </div>
-      <button type="button" class="btn" id="btnThemeToggle" onclick="toggleTheme()" title="Chuyển giao diện sáng / tối">☀️ Giao diện sáng</button>
+      <button type="button" class="btn btn-icon" id="btnThemeToggle" onclick="toggleTheme()" title="Chuyển giao diện sáng / tối" aria-label="Chuyển giao diện sáng / tối"></button>
       <button class="btn btn-danger" onclick="clearCurrentMonth()">Xóa tháng này</button>
     </div>
   </div>
@@ -534,13 +605,13 @@
           <div>
             <span class="stat-label">Tổng số giờ OT</span>
           </div>
-          <span class="stat-value" id="valTotalOT" style="color:#fbbf24;">0</span>
+          <span class="stat-value" id="valTotalOT" style="color:var(--ot-color);">0</span>
         </div>
         <div class="stat-row">
           <div>
             <span class="stat-label">Giờ ca đêm</span>
           </div>
-          <span class="stat-value" id="valNightHours" style="color:#c084fc;">0</span>
+          <span class="stat-value" id="valNightHours" style="color:var(--night-color);">0</span>
         </div>
       </div>
 
@@ -557,15 +628,15 @@
         </div>
         <div class="stat-row">
           <span class="stat-label">Khấu trừ BHXH (10.5%)</span>
-          <span class="stat-value" id="valDeductBHXH" style="color:#f87171;">598,500 đ</span>
+          <span class="stat-value" id="valDeductBHXH" style="color:var(--deduct-color);">598,500 đ</span>
         </div>
         <div class="stat-row">
           <span class="stat-label">Khấu trừ Đoàn phí (0.5%)</span>
-          <span class="stat-value" id="valDeductUnion" style="color:#f87171;">28,500 đ</span>
+          <span class="stat-value" id="valDeductUnion" style="color:var(--deduct-color);">28,500 đ</span>
         </div>
         <div class="stat-row summary-total">
           <span class="stat-label"><strong>(5) Tổng khấu trừ</strong></span>
-          <span class="stat-value" id="valTotalDeduct" style="color:#f87171;">627,000 đ</span>
+          <span class="stat-value" id="valTotalDeduct" style="color:var(--deduct-color);">627,000 đ</span>
         </div>
       </div>
     </div>
@@ -574,7 +645,7 @@
     <div class="card">
       <h2>
         <span>Chi tiết</span>
-        <span id="hourlyRateBadge" style="color:#34d399;font-size:0.88rem;">0 đ/h</span>
+        <span id="hourlyRateBadge" style="color:var(--accent);font-size:0.88rem;">0 đ/h</span>
       </h2>
       <div class="stat-row">
         <span class="stat-label"><strong>(1) Lương cơ bản (Tự nhập)</strong></span>
@@ -582,11 +653,11 @@
       </div>
       <div class="stat-row" style="gap:16px;">
         <span class="stat-label" style="flex:1; max-width:340px; line-height:1.45;"><strong>(2) tổng thu nhập làm ngoài giờ + Giờ bổ sung theo hệ số + Giờ bổ sung vắt ca ngày lễ, ngày OFF</strong></span>
-        <span class="stat-value" id="valIncomeOT" style="color:#38bdf8; text-align:right; white-space:nowrap;">0 đ</span>
+        <span class="stat-value" id="valIncomeOT" style="color:var(--day-val-money); text-align:right; white-space:nowrap;">0 đ</span>
       </div>
       <div class="stat-row">
         <span class="stat-label"><strong>(3) Thu nhập phụ trội ban đêm</strong></span>
-        <span class="stat-value" id="valIncomeNight" style="color:#c084fc;">0 đ</span>
+        <span class="stat-value" id="valIncomeNight" style="color:var(--night-color);">0 đ</span>
       </div>
       <div class="stat-row section-break">
         <span class="stat-label">Phụ cấp đi lại</span>
@@ -612,7 +683,7 @@
       </div>
       <div class="stat-row summary-total">
         <span class="stat-label"><strong>(4) Tổng phụ cấp</strong></span>
-        <span class="stat-value" id="valTotalAllow" style="color:#34d399;">414,000 đ</span>
+        <span class="stat-value" id="valTotalAllow" style="color:var(--allow-color);">414,000 đ</span>
       </div>
 
       <div class="total-banner">
@@ -630,7 +701,7 @@
 <div class="toast" id="toast">Đã lưu dữ liệu!</div>
 
 <script>
-const SHIFTS = [{"code": "[12] 06:00 - 18:00", "desc": "Công làm việc ngày thường", "hours": 12, "coeff_base": 1.0, "day_type": "T", "ot_day": 0.0, "ot_night": 0.0}, {"code": "[12] 18:00 - 06:00", "desc": "Công làm việc ngày thường", "hours": 12, "coeff_base": 1.2, "day_type": "T", "ot_day": 0.0, "ot_night": 0.0}, {"code": "[12O] 06:00 - 18:00", "desc": "OT ngày : 12.00 - OT đêm : 0.00", "hours": 12, "coeff_base": 1.5, "day_type": "O", "ot_day": 12.0, "ot_night": 0.0}, {"code": "[12O] 18:00 - 06:00", "desc": "OT ngày : 4.00 - OT đêm : 8.00", "hours": 12, "coeff_base": 1.9, "day_type": "O", "ot_day": 4.0, "ot_night": 8.0}, {"code": "[8CN] 06:00 - 14:00", "desc": "OT ngày : 8.00 - OT đêm : 0.00", "hours": 8, "coeff_base": 2.0, "day_type": "CN", "ot_day": 8.0, "ot_night": 0.0}, {"code": "[8CN] 14:00 - 22:00", "desc": "OT ngày : 8.00 - OT đêm : 0.00", "hours": 8, "coeff_base": 2.0, "day_type": "CN", "ot_day": 8.0, "ot_night": 0.0}, {"code": "[8CN] 22:00 - 06:00", "desc": "OT ngày : 0.00 - OT đêm : 8.00", "hours": 8, "coeff_base": 2.25, "day_type": "CN", "ot_day": 0.0, "ot_night": 8.0}, {"code": "[12CN] 06:00 - 18:00", "desc": "OT ngày : 12.00 - OT đêm : 0.00", "hours": 12, "coeff_base": 2.0, "day_type": "CN", "ot_day": 12.0, "ot_night": 0.0}, {"code": "[12CN] 18:00 - 06:00", "desc": "OT ngày : 4.00 - OT đêm : 8.00", "hours": 12, "coeff_base": 2.16666667, "day_type": "CN", "ot_day": 4.0, "ot_night": 8.0}, {"code": "[8] 06:00 - 14:00", "desc": "Công làm việc ngày thường", "hours": 8, "coeff_base": 1.0, "day_type": "T", "ot_day": 0.0, "ot_night": 0.0}, {"code": "[8] 14:00 - 22:00", "desc": "Công làm việc ngày thường", "hours": 8, "coeff_base": 1.0, "day_type": "T", "ot_day": 0.0, "ot_night": 0.0}, {"code": "[8] 22:00 - 06:00", "desc": "Công làm việc ngày thường", "hours": 8, "coeff_base": 1.3, "day_type": "T", "ot_day": 0.0, "ot_night": 0.0}, {"code": "[8O] 06:00 - 14:00", "desc": "OT ngày : 4.00 - OT đêm : 0.00", "hours": 8, "coeff_base": 1.5, "day_type": "O", "ot_day": 8.0, "ot_night": 0.0}, {"code": "[8O] 14:00 - 22:00", "desc": "OT ngày : 4.00 - OT đêm : 0.00", "hours": 8, "coeff_base": 1.5, "day_type": "O", "ot_day": 8.0, "ot_night": 0.0}, {"code": "[8O] 22:00 - 06:00", "desc": "OT ngày : 8.00 - OT đêm : 0.00", "hours": 12, "coeff_base": 2.1, "day_type": "O", "ot_day": 0.0, "ot_night": 8.0}, {"code": "[12ON] 06:00 - 18:00", "desc": "OT ngày : 4.00 - OT đêm : 0.00", "hours": 12, "coeff_base": 1.16666667, "day_type": "O", "ot_day": 4.0, "ot_night": 0.0}, {"code": "[12OD] 18:00 - 06:00", "desc": "OT ngày : 4.00 - OT đêm : 0.00", "hours": 12, "coeff_base": 1.36666667, "day_type": "O", "ot_day": 4.0, "ot_night": 0.0}, {"code": "[4O] 18:00 - 22:00", "desc": "OT ngày : 0.00 - OT đêm : 0.00", "hours": 4, "coeff_base": 1.5, "day_type": "O", "ot_day": 4.0, "ot_night": 0.0}, {"code": "[8L] 06:00 - 14:00", "desc": "OT ngày : 4.00 - OT đêm : 0.00", "hours": 8, "coeff_base": 4.0, "day_type": "L", "ot_day": 8.0, "ot_night": 0.0}, {"code": "[8L] 14:00 - 22:00", "desc": "OT ngày : 4.00 - OT đêm : 0.00", "hours": 8, "coeff_base": 4.0, "day_type": "L", "ot_day": 8.0, "ot_night": 0.0}, {"code": "[8L] 22:00 - 06:00", "desc": "OT ngày : 8.00 - OT đêm : 0.00", "hours": 8, "coeff_base": 4.9, "day_type": "L", "ot_day": 0.0, "ot_night": 8.0}, {"code": "[12L] 06:00 - 18:00", "desc": "OT ngày : 8.00 - OT đêm : 0.00", "hours": 12, "coeff_base": 4.0, "day_type": "L", "ot_day": 12.0, "ot_night": 0.0}, {"code": "[12L] 18:00 - 06:00", "desc": "OT ngày : 0.00 - OT đêm : 8.00", "hours": 12, "coeff_base": 4.6, "day_type": "L", "ot_day": 4.0, "ot_night": 8.0}, {"code": "[8L]", "desc": "[8L]", "hours": 8, "coeff_base": 1.0, "day_type": "L", "ot_day": 0.0, "ot_night": 0.0}, {"code": "[8P]", "desc": "[8P]", "hours": 8, "coeff_base": 1.0, "day_type": "T", "ot_day": 0.0, "ot_night": 0.0}, {"code": "[12P]", "desc": "[12P]", "hours": 12, "coeff_base": 1.0, "day_type": "T", "ot_day": 0.0, "ot_night": 0.0}];
+const SHIFTS = [{"code": "[12] 06:00 - 18:00", "desc": "Công làm việc ngày thường", "hours": 12, "coeff_base": 1.0, "day_type": "T", "ot_day": 0.0, "ot_night": 0.0}, {"code": "[12] 18:00 - 06:00", "desc": "Công làm việc ngày thường", "hours": 12, "coeff_base": 1.2, "day_type": "T", "ot_day": 0.0, "ot_night": 0.0}, {"code": "[12O] 06:00 - 18:00", "desc": "OT ngày : 12.00 - OT đêm : 0.00", "hours": 12, "coeff_base": 1.5, "day_type": "O", "ot_day": 12.0, "ot_night": 0.0}, {"code": "[12O] 18:00 - 06:00", "desc": "OT ngày : 4.00 - OT đêm : 8.00", "hours": 12, "coeff_base": 1.9, "day_type": "O", "ot_day": 4.0, "ot_night": 8.0}, {"code": "[8CN] 06:00 - 14:00", "desc": "OT ngày : 8.00 - OT đêm : 0.00", "hours": 8, "coeff_base": 2.0, "day_type": "CN", "ot_day": 8.0, "ot_night": 0.0}, {"code": "[8CN] 14:00 - 22:00", "desc": "OT ngày : 8.00 - OT đêm : 0.00", "hours": 8, "coeff_base": 2.0, "day_type": "CN", "ot_day": 8.0, "ot_night": 0.0}, {"code": "[8CN] 22:00 - 06:00", "desc": "OT ngày : 0.00 - OT đêm : 8.00", "hours": 8, "coeff_base": 2.25, "day_type": "CN", "ot_day": 0.0, "ot_night": 8.0}, {"code": "[12CN] 06:00 - 18:00", "desc": "OT ngày : 12.00 - OT đêm : 0.00", "hours": 12, "coeff_base": 2.0, "day_type": "CN", "ot_day": 12.0, "ot_night": 0.0}, {"code": "[12CN] 18:00 - 06:00", "desc": "OT ngày : 4.00 - OT đêm : 8.00", "hours": 12, "coeff_base": 2.16666667, "day_type": "CN", "ot_day": 4.0, "ot_night": 8.0}, {"code": "[8] 06:00 - 14:00", "desc": "Công làm việc ngày thường", "hours": 8, "coeff_base": 1.0, "day_type": "T", "ot_day": 0.0, "ot_night": 0.0}, {"code": "[8] 14:00 - 22:00", "desc": "Công làm việc ngày thường", "hours": 8, "coeff_base": 1.0, "day_type": "T", "ot_day": 0.0, "ot_night": 0.0}, {"code": "[8] 22:00 - 06:00", "desc": "Công làm việc ngày thường", "hours": 8, "coeff_base": 1.3, "day_type": "T", "ot_day": 0.0, "ot_night": 0.0}, {"code": "[8O] 06:00 - 14:00", "desc": "OT ngày : 8.00 - OT đêm : 0.00", "hours": 8, "coeff_base": 1.5, "day_type": "O", "ot_day": 8.0, "ot_night": 0.0}, {"code": "[8O] 14:00 - 22:00", "desc": "OT ngày : 8.00 - OT đêm : 0.00", "hours": 8, "coeff_base": 1.5, "day_type": "O", "ot_day": 8.0, "ot_night": 0.0}, {"code": "[8O] 22:00 - 06:00", "desc": "OT ngày : 0.00 - OT đêm : 8.00", "hours": 8, "coeff_base": 2.1, "day_type": "O", "ot_day": 0.0, "ot_night": 8.0}, {"code": "[12ON] 06:00 - 18:00", "desc": "OT ngày : 4.00 - OT đêm : 0.00", "hours": 12, "coeff_base": 1.16666667, "day_type": "O", "ot_day": 4.0, "ot_night": 0.0}, {"code": "[12OD] 18:00 - 06:00", "desc": "OT ngày : 4.00 - OT đêm : 0.00", "hours": 12, "coeff_base": 1.36666667, "day_type": "O", "ot_day": 4.0, "ot_night": 0.0}, {"code": "[4O] 18:00 - 22:00", "desc": "OT ngày : 0.00 - OT đêm : 0.00", "hours": 4, "coeff_base": 1.5, "day_type": "O", "ot_day": 4.0, "ot_night": 0.0}, {"code": "[8L] 06:00 - 14:00", "desc": "OT ngày : 4.00 - OT đêm : 0.00", "hours": 8, "coeff_base": 4.0, "day_type": "L", "ot_day": 8.0, "ot_night": 0.0}, {"code": "[8L] 14:00 - 22:00", "desc": "OT ngày : 4.00 - OT đêm : 0.00", "hours": 8, "coeff_base": 4.0, "day_type": "L", "ot_day": 8.0, "ot_night": 0.0}, {"code": "[8L] 22:00 - 06:00", "desc": "OT ngày : 8.00 - OT đêm : 0.00", "hours": 8, "coeff_base": 4.9, "day_type": "L", "ot_day": 0.0, "ot_night": 8.0}, {"code": "[12L] 06:00 - 18:00", "desc": "OT ngày : 8.00 - OT đêm : 0.00", "hours": 12, "coeff_base": 4.0, "day_type": "L", "ot_day": 12.0, "ot_night": 0.0}, {"code": "[12L] 18:00 - 06:00", "desc": "OT ngày : 0.00 - OT đêm : 8.00", "hours": 12, "coeff_base": 4.6, "day_type": "L", "ot_day": 4.0, "ot_night": 8.0}, {"code": "[8L]", "desc": "[8L]", "hours": 8, "coeff_base": 1.0, "day_type": "L", "ot_day": 0.0, "ot_night": 0.0}, {"code": "[8P]", "desc": "[8P]", "hours": 8, "coeff_base": 1.0, "day_type": "T", "ot_day": 0.0, "ot_night": 0.0}, {"code": "[12P]", "desc": "[12P]", "hours": 12, "coeff_base": 1.0, "day_type": "T", "ot_day": 0.0, "ot_night": 0.0}];
 const MATRIX = {"[12] 06:00 - 18:00": {"[12] 06:00 - 18:00": 1.0, "[12] 18:00 - 06:00": 1.0, "[12O] 06:00 - 18:00": 1.0, "[12O] 18:00 - 06:00": 1.0, "[8CN] 06:00 - 14:00": 1.0, "[8CN] 14:00 - 22:00": 1.0, "[8CN] 22:00 - 06:00": 1.0, "[12CN] 06:00 - 18:00": 1.0, "[12CN] 18:00 - 06:00": 1.0, "[8] 06:00 - 14:00": 1.0, "[8] 14:00 - 22:00": 1.0, "[8] 22:00 - 06:00": 1.0, "[8O] 06:00 - 14:00": 1.0, "[8O] 14:00 - 22:00": 1.0, "[8O] 22:00 - 06:00": 1.0, "[12ON] 06:00 - 18:00": 1.0, "[12OD] 18:00 - 06:00": 1.0, "[4O] 18:00 - 22:00": 1.0, "[8L] 06:00 - 14:00": 1.0, "[8L] 14:00 - 22:00": 1.0, "[8L] 22:00 - 06:00": 1.0, "[12L] 06:00 - 18:00": 1.0, "[12L] 18:00 - 06:00": 1.0, "[8L]": 1.0, "[8P]": 1.0, "[12P]": 1.0}, "[12] 18:00 - 06:00": {"[12] 06:00 - 18:00": 1.2, "[12] 18:00 - 06:00": 1.2, "[12O] 06:00 - 18:00": 1.2, "[12O] 18:00 - 06:00": 1.2, "[8CN] 06:00 - 14:00": 1.25, "[8CN] 14:00 - 22:00": 1.25, "[8CN] 22:00 - 06:00": 1.25, "[12CN] 06:00 - 18:00": 1.25, "[12CN] 18:00 - 06:00": 1.25, "[8] 06:00 - 14:00": 1.2, "[8] 14:00 - 22:00": 1.2, "[8] 22:00 - 06:00": 1.2, "[8O] 06:00 - 14:00": 1.2, "[8O] 14:00 - 22:00": 1.2, "[8O] 22:00 - 06:00": 1.2, "[12ON] 06:00 - 18:00": 1.2, "[12OD] 18:00 - 06:00": 1.2, "[4O] 18:00 - 22:00": 1.2, "[8L] 06:00 - 14:00": 1.85, "[8L] 14:00 - 22:00": 1.85, "[8L] 22:00 - 06:00": 1.85, "[12L] 06:00 - 18:00": 1.85, "[12L] 18:00 - 06:00": 1.85, "[8L]": 1.85, "[8P]": 1.2, "[12P]": 1.2}, "[12O] 06:00 - 18:00": {"[12] 06:00 - 18:00": 1.5, "[12] 18:00 - 06:00": 1.5, "[12O] 06:00 - 18:00": 1.5, "[12O] 18:00 - 06:00": 1.5, "[8CN] 06:00 - 14:00": 1.5, "[8CN] 14:00 - 22:00": 1.5, "[8CN] 22:00 - 06:00": 1.5, "[12CN] 06:00 - 18:00": 1.5, "[12CN] 18:00 - 06:00": 1.5, "[8] 06:00 - 14:00": 1.5, "[8] 14:00 - 22:00": 1.5, "[8] 22:00 - 06:00": 1.5, "[8O] 06:00 - 14:00": 1.5, "[8O] 14:00 - 22:00": 1.5, "[8O] 22:00 - 06:00": 1.5, "[12ON] 06:00 - 18:00": 1.5, "[12OD] 18:00 - 06:00": 1.5, "[4O] 18:00 - 22:00": 1.5, "[8L] 06:00 - 14:00": 1.5, "[8L] 14:00 - 22:00": 1.5, "[8L] 22:00 - 06:00": 1.5, "[12L] 06:00 - 18:00": 1.5, "[12L] 18:00 - 06:00": 1.5, "[8L]": 1.5, "[8P]": 1.5, "[12P]": 1.5}, "[12O] 18:00 - 06:00": {"[12] 06:00 - 18:00": 1.9, "[12] 18:00 - 06:00": 1.9, "[12O] 06:00 - 18:00": 1.9, "[12O] 18:00 - 06:00": 1.9, "[8CN] 06:00 - 14:00": 2.2, "[8CN] 14:00 - 22:00": 2.2, "[8CN] 22:00 - 06:00": 2.2, "[12CN] 06:00 - 18:00": 2.2, "[12CN] 18:00 - 06:00": 2.2, "[8] 06:00 - 14:00": 1.9, "[8] 14:00 - 22:00": 1.9, "[8] 22:00 - 06:00": 1.9, "[8O] 06:00 - 14:00": 1.9, "[8O] 14:00 - 22:00": 1.9, "[8O] 22:00 - 06:00": 1.9, "[12ON] 06:00 - 18:00": 1.9, "[12OD] 18:00 - 06:00": 1.9, "[4O] 18:00 - 22:00": 1.9, "[8L] 06:00 - 14:00": 2.8, "[8L] 14:00 - 22:00": 2.8, "[8L] 22:00 - 06:00": 2.8, "[12L] 06:00 - 18:00": 2.8, "[12L] 18:00 - 06:00": 2.8, "[8L]": 2.8, "[8P]": 1.9, "[12P]": 1.9}, "[8CN] 06:00 - 14:00": {"[12] 06:00 - 18:00": 2.0, "[12] 18:00 - 06:00": 2.0, "[12O] 06:00 - 18:00": 2.0, "[12O] 18:00 - 06:00": 2.0, "[8CN] 06:00 - 14:00": 2.0, "[8CN] 14:00 - 22:00": 2.0, "[8CN] 22:00 - 06:00": 2.0, "[12CN] 06:00 - 18:00": 2.0, "[12CN] 18:00 - 06:00": 2.0, "[8] 06:00 - 14:00": 2.0, "[8] 14:00 - 22:00": 2.0, "[8] 22:00 - 06:00": 2.0, "[8O] 06:00 - 14:00": 2.0, "[8O] 14:00 - 22:00": 2.0, "[8O] 22:00 - 06:00": 2.0, "[12ON] 06:00 - 18:00": 2.0, "[12OD] 18:00 - 06:00": 2.0, "[4O] 18:00 - 22:00": 2.0, "[8L] 06:00 - 14:00": 2.0, "[8L] 14:00 - 22:00": 2.0, "[8L] 22:00 - 06:00": 2.0, "[12L] 06:00 - 18:00": 2.0, "[12L] 18:00 - 06:00": 2.0, "[8L]": 2.0, "[8P]": 2.0, "[12P]": 2.0}, "[8CN] 14:00 - 22:00": {"[12] 06:00 - 18:00": 2.0, "[12] 18:00 - 06:00": 2.0, "[12O] 06:00 - 18:00": 2.0, "[12O] 18:00 - 06:00": 2.0, "[8CN] 06:00 - 14:00": 2.0, "[8CN] 14:00 - 22:00": 2.0, "[8CN] 22:00 - 06:00": 2.0, "[12CN] 06:00 - 18:00": 2.0, "[12CN] 18:00 - 06:00": 2.0, "[8] 06:00 - 14:00": 2.0, "[8] 14:00 - 22:00": 2.0, "[8] 22:00 - 06:00": 2.0, "[8O] 06:00 - 14:00": 2.0, "[8O] 14:00 - 22:00": 2.0, "[8O] 22:00 - 06:00": 2.0, "[12ON] 06:00 - 18:00": 2.0, "[12OD] 18:00 - 06:00": 2.0, "[4O] 18:00 - 22:00": 2.0, "[8L] 06:00 - 14:00": 2.0, "[8L] 14:00 - 22:00": 2.0, "[8L] 22:00 - 06:00": 2.0, "[12L] 06:00 - 18:00": 2.0, "[12L] 18:00 - 06:00": 2.0, "[8L]": 2.0, "[8P]": 2.0, "[12P]": 2.0}, "[8CN] 22:00 - 06:00": {"[12] 06:00 - 18:00": 2.25, "[12] 18:00 - 06:00": 2.25, "[12O] 06:00 - 18:00": 2.25, "[12O] 18:00 - 06:00": 2.25, "[8CN] 06:00 - 14:00": 2.25, "[8CN] 14:00 - 22:00": 2.25, "[8CN] 22:00 - 06:00": 2.25, "[12CN] 06:00 - 18:00": 2.25, "[12CN] 18:00 - 06:00": 2.25, "[8] 06:00 - 14:00": 2.25, "[8] 14:00 - 22:00": 2.25, "[8] 22:00 - 06:00": 2.25, "[8O] 06:00 - 14:00": 2.25, "[8O] 14:00 - 22:00": 2.25, "[8O] 22:00 - 06:00": 2.25, "[12ON] 06:00 - 18:00": 2.25, "[12OD] 18:00 - 06:00": 2.25, "[4O] 18:00 - 22:00": 2.25, "[8L] 06:00 - 14:00": 3.6, "[8L] 14:00 - 22:00": 3.6, "[8L] 22:00 - 06:00": 3.6, "[12L] 06:00 - 18:00": 3.6, "[12L] 18:00 - 06:00": 3.6, "[8L]": 3.6, "[8P]": 2.25, "[12P]": 2.25}, "[12CN] 06:00 - 18:00": {"[12] 06:00 - 18:00": 2.0, "[12] 18:00 - 06:00": 2.0, "[12O] 06:00 - 18:00": 2.0, "[12O] 18:00 - 06:00": 2.0, "[8CN] 06:00 - 14:00": 2.0, "[8CN] 14:00 - 22:00": 2.0, "[8CN] 22:00 - 06:00": 2.0, "[12CN] 06:00 - 18:00": 2.0, "[12CN] 18:00 - 06:00": 2.0, "[8] 06:00 - 14:00": 2.0, "[8] 14:00 - 22:00": 2.0, "[8] 22:00 - 06:00": 2.0, "[8O] 06:00 - 14:00": 2.0, "[8O] 14:00 - 22:00": 2.0, "[8O] 22:00 - 06:00": 2.0, "[12ON] 06:00 - 18:00": 2.0, "[12OD] 18:00 - 06:00": 2.0, "[4O] 18:00 - 22:00": 2.0, "[8L] 06:00 - 14:00": 2.0, "[8L] 14:00 - 22:00": 2.0, "[8L] 22:00 - 06:00": 2.0, "[12L] 06:00 - 18:00": 2.0, "[12L] 18:00 - 06:00": 2.0, "[8L]": 2.0, "[8P]": 2.0, "[12P]": 2.0}, "[12CN] 18:00 - 06:00": {"[12] 06:00 - 18:00": 2.16666667, "[12] 18:00 - 06:00": 2.16666667, "[12O] 06:00 - 18:00": 2.16666667, "[12O] 18:00 - 06:00": 2.16666667, "[8CN] 06:00 - 14:00": 2.16666667, "[8CN] 14:00 - 22:00": 2.16666667, "[8CN] 22:00 - 06:00": 2.16666667, "[12CN] 06:00 - 18:00": 2.16666667, "[12CN] 18:00 - 06:00": 2.16666667, "[8] 06:00 - 14:00": 2.16666667, "[8] 14:00 - 22:00": 2.16666667, "[8] 22:00 - 06:00": 2.16666667, "[8O] 06:00 - 14:00": 2.16666667, "[8O] 14:00 - 22:00": 2.16666667, "[8O] 22:00 - 06:00": 2.16666667, "[12ON] 06:00 - 18:00": 2.16666667, "[12OD] 18:00 - 06:00": 2.16666667, "[4O] 18:00 - 22:00": 2.16666667, "[8L] 06:00 - 14:00": 3.6, "[8L] 14:00 - 22:00": 3.6, "[8L] 22:00 - 06:00": 3.6, "[12L] 06:00 - 18:00": 3.6, "[12L] 18:00 - 06:00": 3.6, "[8L]": 3.6, "[8P]": 2.16666667, "[12P]": 2.16666667}, "[8] 06:00 - 14:00": {"[12] 06:00 - 18:00": 1.0, "[12] 18:00 - 06:00": 1.0, "[12O] 06:00 - 18:00": 1.0, "[12O] 18:00 - 06:00": 1.0, "[8CN] 06:00 - 14:00": 1.0, "[8CN] 14:00 - 22:00": 1.0, "[8CN] 22:00 - 06:00": 1.0, "[12CN] 06:00 - 18:00": 1.0, "[12CN] 18:00 - 06:00": 1.0, "[8] 06:00 - 14:00": 1.0, "[8] 14:00 - 22:00": 1.0, "[8] 22:00 - 06:00": 1.0, "[8O] 06:00 - 14:00": 1.0, "[8O] 14:00 - 22:00": 1.0, "[8O] 22:00 - 06:00": 1.0, "[12ON] 06:00 - 18:00": 1.0, "[12OD] 18:00 - 06:00": 1.0, "[4O] 18:00 - 22:00": 1.0, "[8L] 06:00 - 14:00": 1.0, "[8L] 14:00 - 22:00": 1.0, "[8L] 22:00 - 06:00": 1.0, "[12L] 06:00 - 18:00": 1.0, "[12L] 18:00 - 06:00": 1.0, "[8L]": 1.0, "[8P]": 1.0, "[12P]": 1.0}, "[8] 14:00 - 22:00": {"[12] 06:00 - 18:00": 1.0, "[12] 18:00 - 06:00": 1.0, "[12O] 06:00 - 18:00": 1.0, "[12O] 18:00 - 06:00": 1.0, "[8CN] 06:00 - 14:00": 1.0, "[8CN] 14:00 - 22:00": 1.0, "[8CN] 22:00 - 06:00": 1.0, "[12CN] 06:00 - 18:00": 1.0, "[12CN] 18:00 - 06:00": 1.0, "[8] 06:00 - 14:00": 1.0, "[8] 14:00 - 22:00": 1.0, "[8] 22:00 - 06:00": 1.0, "[8O] 06:00 - 14:00": 1.0, "[8O] 14:00 - 22:00": 1.0, "[8O] 22:00 - 06:00": 1.0, "[12ON] 06:00 - 18:00": 1.0, "[12OD] 18:00 - 06:00": 1.0, "[4O] 18:00 - 22:00": 1.0, "[8L] 06:00 - 14:00": 1.0, "[8L] 14:00 - 22:00": 1.0, "[8L] 22:00 - 06:00": 1.0, "[12L] 06:00 - 18:00": 1.0, "[12L] 18:00 - 06:00": 1.0, "[8L]": 1.0, "[8P]": 1.0, "[12P]": 1.0}, "[8] 22:00 - 06:00": {"[12] 06:00 - 18:00": 1.3, "[12] 18:00 - 06:00": 1.3, "[12O] 06:00 - 18:00": 1.3, "[12O] 18:00 - 06:00": 1.3, "[8CN] 06:00 - 14:00": 1.375, "[8CN] 14:00 - 22:00": 1.375, "[8CN] 22:00 - 06:00": 1.375, "[12CN] 06:00 - 18:00": 1.375, "[12CN] 18:00 - 06:00": 1.375, "[8] 06:00 - 14:00": 1.3, "[8] 14:00 - 22:00": 1.3, "[8] 22:00 - 06:00": 1.3, "[8O] 06:00 - 14:00": 1.3, "[8O] 14:00 - 22:00": 1.3, "[8O] 22:00 - 06:00": 1.3, "[12ON] 06:00 - 18:00": 1.3, "[12OD] 18:00 - 06:00": 1.3, "[4O] 18:00 - 22:00": 1.3, "[8L] 06:00 - 14:00": 2.275, "[8L] 14:00 - 22:00": 2.275, "[8L] 22:00 - 06:00": 2.275, "[12L] 06:00 - 18:00": 2.275, "[12L] 18:00 - 06:00": 2.275, "[8L]": 2.275, "[8P]": 1.3, "[12P]": 1.3}, "[8O] 06:00 - 14:00": {"[12] 06:00 - 18:00": 1.5, "[12] 18:00 - 06:00": 1.5, "[12O] 06:00 - 18:00": 1.5, "[12O] 18:00 - 06:00": 1.5, "[8CN] 06:00 - 14:00": 1.5, "[8CN] 14:00 - 22:00": 1.5, "[8CN] 22:00 - 06:00": 1.5, "[12CN] 06:00 - 18:00": 1.5, "[12CN] 18:00 - 06:00": 1.5, "[8] 06:00 - 14:00": 1.5, "[8] 14:00 - 22:00": 1.5, "[8] 22:00 - 06:00": 1.5, "[8O] 06:00 - 14:00": 1.5, "[8O] 14:00 - 22:00": 1.5, "[8O] 22:00 - 06:00": 1.5, "[12ON] 06:00 - 18:00": 1.5, "[12OD] 18:00 - 06:00": 1.5, "[4O] 18:00 - 22:00": 1.5, "[8L] 06:00 - 14:00": 1.5, "[8L] 14:00 - 22:00": 1.5, "[8L] 22:00 - 06:00": 1.5, "[12L] 06:00 - 18:00": 1.5, "[12L] 18:00 - 06:00": 1.5, "[8L]": 1.5, "[8P]": 1.5, "[12P]": 1.5}, "[8O] 14:00 - 22:00": {"[12] 06:00 - 18:00": 1.5, "[12] 18:00 - 06:00": 1.5, "[12O] 06:00 - 18:00": 1.5, "[12O] 18:00 - 06:00": 1.5, "[8CN] 06:00 - 14:00": 1.5, "[8CN] 14:00 - 22:00": 1.5, "[8CN] 22:00 - 06:00": 1.5, "[12CN] 06:00 - 18:00": 1.5, "[12CN] 18:00 - 06:00": 1.5, "[8] 06:00 - 14:00": 1.5, "[8] 14:00 - 22:00": 1.5, "[8] 22:00 - 06:00": 1.5, "[8O] 06:00 - 14:00": 1.5, "[8O] 14:00 - 22:00": 1.5, "[8O] 22:00 - 06:00": 1.5, "[12ON] 06:00 - 18:00": 1.5, "[12OD] 18:00 - 06:00": 1.5, "[4O] 18:00 - 22:00": 1.5, "[8L] 06:00 - 14:00": 1.5, "[8L] 14:00 - 22:00": 1.5, "[8L] 22:00 - 06:00": 1.5, "[12L] 06:00 - 18:00": 1.5, "[12L] 18:00 - 06:00": 1.5, "[8L]": 1.5, "[8P]": 1.5, "[12P]": 1.5}, "[8O] 22:00 - 06:00": {"[12] 06:00 - 18:00": 2.1, "[12] 18:00 - 06:00": 2.1, "[12O] 06:00 - 18:00": 2.1, "[12O] 18:00 - 06:00": 2.1, "[8CN] 06:00 - 14:00": 2.55, "[8CN] 14:00 - 22:00": 2.55, "[8CN] 22:00 - 06:00": 2.55, "[12CN] 06:00 - 18:00": 2.55, "[12CN] 18:00 - 06:00": 2.55, "[8] 06:00 - 14:00": 2.1, "[8] 14:00 - 22:00": 2.1, "[8] 22:00 - 06:00": 2.1, "[8O] 06:00 - 14:00": 2.1, "[8O] 14:00 - 22:00": 2.1, "[8O] 22:00 - 06:00": 2.1, "[12ON] 06:00 - 18:00": 2.1, "[12OD] 18:00 - 06:00": 2.1, "[4O] 18:00 - 22:00": 2.1, "[8L] 06:00 - 14:00": 3.45, "[8L] 14:00 - 22:00": 3.45, "[8L] 22:00 - 06:00": 3.45, "[12L] 06:00 - 18:00": 3.45, "[12L] 18:00 - 06:00": 3.45, "[8L]": 3.45, "[8P]": 2.1, "[12P]": 2.1}, "[12ON] 06:00 - 18:00": {"[12] 06:00 - 18:00": 1.16666667, "[12] 18:00 - 06:00": 1.16666667, "[12O] 06:00 - 18:00": 1.16666667, "[12O] 18:00 - 06:00": 1.16666667, "[8CN] 06:00 - 14:00": 1.16666667, "[8CN] 14:00 - 22:00": 1.16666667, "[8CN] 22:00 - 06:00": 1.16666667, "[12CN] 06:00 - 18:00": 1.16666667, "[12CN] 18:00 - 06:00": 1.16666667, "[8] 06:00 - 14:00": 1.16666667, "[8] 14:00 - 22:00": 1.16666667, "[8] 22:00 - 06:00": 1.16666667, "[8O] 06:00 - 14:00": 1.16666667, "[8O] 14:00 - 22:00": 1.16666667, "[8O] 22:00 - 06:00": 1.16666667, "[12ON] 06:00 - 18:00": 1.16666667, "[12OD] 18:00 - 06:00": 1.16666667, "[4O] 18:00 - 22:00": 1.16666667, "[8L] 06:00 - 14:00": 1.16666667, "[8L] 14:00 - 22:00": 1.16666667, "[8L] 22:00 - 06:00": 1.16666667, "[12L] 06:00 - 18:00": 1.16666667, "[12L] 18:00 - 06:00": 1.16666667, "[8L]": 1.16666667, "[8P]": 1.16666667, "[12P]": 1.16666667}, "[12OD] 18:00 - 06:00": {"[12] 06:00 - 18:00": 1.36666667, "[12] 18:00 - 06:00": 1.36666667, "[12O] 06:00 - 18:00": 1.36666667, "[12O] 18:00 - 06:00": 1.36666667, "[8CN] 06:00 - 14:00": 1.41666667, "[8CN] 14:00 - 22:00": 1.41666667, "[8CN] 22:00 - 06:00": 1.41666667, "[12CN] 06:00 - 18:00": 1.41666667, "[12CN] 18:00 - 06:00": 1.41666667, "[8] 06:00 - 14:00": 1.36666667, "[8] 14:00 - 22:00": 1.36666667, "[8] 22:00 - 06:00": 1.36666667, "[8O] 06:00 - 14:00": 1.36666667, "[8O] 14:00 - 22:00": 1.36666667, "[8O] 22:00 - 06:00": 1.36666667, "[12ON] 06:00 - 18:00": 1.36666667, "[12OD] 18:00 - 06:00": 1.36666667, "[4O] 18:00 - 22:00": 1.36666667, "[8L] 06:00 - 14:00": 2.01666667, "[8L] 14:00 - 22:00": 2.01666667, "[8L] 22:00 - 06:00": 2.01666667, "[12L] 06:00 - 18:00": 2.01666667, "[12L] 18:00 - 06:00": 2.01666667, "[8L]": 2.01666667, "[8P]": 1.36666667, "[12P]": 1.36666667}, "[4O] 18:00 - 22:00": {"[12] 06:00 - 18:00": 1.5, "[12] 18:00 - 06:00": 1.5, "[12O] 06:00 - 18:00": 1.5, "[12O] 18:00 - 06:00": 1.5, "[8CN] 06:00 - 14:00": 1.5, "[8CN] 14:00 - 22:00": 1.5, "[8CN] 22:00 - 06:00": 1.5, "[12CN] 06:00 - 18:00": 1.5, "[12CN] 18:00 - 06:00": 1.5, "[8] 06:00 - 14:00": 1.5, "[8] 14:00 - 22:00": 1.5, "[8] 22:00 - 06:00": 1.5, "[8O] 06:00 - 14:00": 1.5, "[8O] 14:00 - 22:00": 1.5, "[8O] 22:00 - 06:00": 1.5, "[12ON] 06:00 - 18:00": 1.5, "[12OD] 18:00 - 06:00": 1.5, "[4O] 18:00 - 22:00": 1.5, "[8L] 06:00 - 14:00": 1.5, "[8L] 14:00 - 22:00": 1.5, "[8L] 22:00 - 06:00": 1.5, "[12L] 06:00 - 18:00": 1.5, "[12L] 18:00 - 06:00": 1.5, "[8L]": 1.5, "[8P]": 1.5, "[12P]": 1.5}, "[8L] 06:00 - 14:00": {"[12] 06:00 - 18:00": 4.0, "[12] 18:00 - 06:00": 4.0, "[12O] 06:00 - 18:00": 4.0, "[12O] 18:00 - 06:00": 4.0, "[8CN] 06:00 - 14:00": 4.0, "[8CN] 14:00 - 22:00": 4.0, "[8CN] 22:00 - 06:00": 4.0, "[12CN] 06:00 - 18:00": 4.0, "[12CN] 18:00 - 06:00": 4.0, "[8] 06:00 - 14:00": 4.0, "[8] 14:00 - 22:00": 4.0, "[8] 22:00 - 06:00": 4.0, "[8O] 06:00 - 14:00": 4.0, "[8O] 14:00 - 22:00": 4.0, "[8O] 22:00 - 06:00": 4.0, "[12ON] 06:00 - 18:00": 4.0, "[12OD] 18:00 - 06:00": 4.0, "[4O] 18:00 - 22:00": 4.0, "[8L] 06:00 - 14:00": 4.0, "[8L] 14:00 - 22:00": 4.0, "[8L] 22:00 - 06:00": 4.0, "[12L] 06:00 - 18:00": 4.0, "[12L] 18:00 - 06:00": 4.0, "[8L]": 4.0, "[8P]": 4.0, "[12P]": 4.0}, "[8L] 14:00 - 22:00": {"[12] 06:00 - 18:00": 4.0, "[12] 18:00 - 06:00": 4.0, "[12O] 06:00 - 18:00": 4.0, "[12O] 18:00 - 06:00": 4.0, "[8CN] 06:00 - 14:00": 4.0, "[8CN] 14:00 - 22:00": 4.0, "[8CN] 22:00 - 06:00": 4.0, "[12CN] 06:00 - 18:00": 4.0, "[12CN] 18:00 - 06:00": 4.0, "[8] 06:00 - 14:00": 4.0, "[8] 14:00 - 22:00": 4.0, "[8] 22:00 - 06:00": 4.0, "[8O] 06:00 - 14:00": 4.0, "[8O] 14:00 - 22:00": 4.0, "[8O] 22:00 - 06:00": 4.0, "[12ON] 06:00 - 18:00": 4.0, "[12OD] 18:00 - 06:00": 4.0, "[4O] 18:00 - 22:00": 4.0, "[8L] 06:00 - 14:00": 4.0, "[8L] 14:00 - 22:00": 4.0, "[8L] 22:00 - 06:00": 4.0, "[12L] 06:00 - 18:00": 4.0, "[12L] 18:00 - 06:00": 4.0, "[8L]": 4.0, "[8P]": 4.0, "[12P]": 4.0}, "[8L] 22:00 - 06:00": {"[12] 06:00 - 18:00": 3.55, "[12] 18:00 - 06:00": 3.55, "[12O] 06:00 - 18:00": 3.55, "[12O] 18:00 - 06:00": 3.55, "[8CN] 06:00 - 14:00": 4.0, "[8CN] 14:00 - 22:00": 4.0, "[8CN] 22:00 - 06:00": 4.0, "[12CN] 06:00 - 18:00": 4.0, "[12CN] 18:00 - 06:00": 4.0, "[8] 06:00 - 14:00": 3.55, "[8] 14:00 - 22:00": 3.55, "[8] 22:00 - 06:00": 3.55, "[8O] 06:00 - 14:00": 3.55, "[8O] 14:00 - 22:00": 3.55, "[8O] 22:00 - 06:00": 3.55, "[12ON] 06:00 - 18:00": 3.55, "[12OD] 18:00 - 06:00": 3.55, "[4O] 18:00 - 22:00": 3.55, "[8L] 06:00 - 14:00": 4.9, "[8L] 14:00 - 22:00": 4.9, "[8L] 22:00 - 06:00": 4.9, "[12L] 06:00 - 18:00": 4.9, "[12L] 18:00 - 06:00": 4.9, "[8L]": 4.9, "[8P]": 3.55, "[12P]": 3.55}, "[12L] 06:00 - 18:00": {"[12] 06:00 - 18:00": 4.0, "[12] 18:00 - 06:00": 4.0, "[12O] 06:00 - 18:00": 4.0, "[12O] 18:00 - 06:00": 4.0, "[8CN] 06:00 - 14:00": 4.0, "[8CN] 14:00 - 22:00": 4.0, "[8CN] 22:00 - 06:00": 4.0, "[12CN] 06:00 - 18:00": 4.0, "[12CN] 18:00 - 06:00": 4.0, "[8] 06:00 - 14:00": 4.0, "[8] 14:00 - 22:00": 4.0, "[8] 22:00 - 06:00": 4.0, "[8O] 06:00 - 14:00": 4.0, "[8O] 14:00 - 22:00": 4.0, "[8O] 22:00 - 06:00": 4.0, "[12ON] 06:00 - 18:00": 4.0, "[12OD] 18:00 - 06:00": 4.0, "[4O] 18:00 - 22:00": 4.0, "[8L] 06:00 - 14:00": 4.0, "[8L] 14:00 - 22:00": 4.0, "[8L] 22:00 - 06:00": 4.0, "[12L] 06:00 - 18:00": 4.0, "[12L] 18:00 - 06:00": 4.0, "[8L]": 4.0, "[8P]": 4.0, "[12P]": 4.0}, "[12L] 18:00 - 06:00": {"[12] 06:00 - 18:00": 3.7, "[12] 18:00 - 06:00": 3.7, "[12O] 06:00 - 18:00": 3.7, "[12O] 18:00 - 06:00": 3.7, "[8CN] 06:00 - 14:00": 4.0, "[8CN] 14:00 - 22:00": 4.0, "[8CN] 22:00 - 06:00": 4.0, "[12CN] 06:00 - 18:00": 4.0, "[12CN] 18:00 - 06:00": 4.0, "[8] 06:00 - 14:00": 3.7, "[8] 14:00 - 22:00": 3.7, "[8] 22:00 - 06:00": 3.7, "[8O] 06:00 - 14:00": 3.7, "[8O] 14:00 - 22:00": 3.7, "[8O] 22:00 - 06:00": 3.7, "[12ON] 06:00 - 18:00": 3.7, "[12OD] 18:00 - 06:00": 3.7, "[4O] 18:00 - 22:00": 3.7, "[8L] 06:00 - 14:00": 4.6, "[8L] 14:00 - 22:00": 4.6, "[8L] 22:00 - 06:00": 4.6, "[12L] 06:00 - 18:00": 4.6, "[12L] 18:00 - 06:00": 4.6, "[8L]": 4.6, "[8P]": 3.7, "[12P]": 3.7}, "[8L]": {"[12] 06:00 - 18:00": 1.0, "[12] 18:00 - 06:00": 1.0, "[12O] 06:00 - 18:00": 1.0, "[12O] 18:00 - 06:00": 1.0, "[8CN] 06:00 - 14:00": 1.0, "[8CN] 14:00 - 22:00": 1.0, "[8CN] 22:00 - 06:00": 1.0, "[12CN] 06:00 - 18:00": 1.0, "[12CN] 18:00 - 06:00": 1.0, "[8] 06:00 - 14:00": 1.0, "[8] 14:00 - 22:00": 1.0, "[8] 22:00 - 06:00": 1.0, "[8O] 06:00 - 14:00": 1.0, "[8O] 14:00 - 22:00": 1.0, "[8O] 22:00 - 06:00": 1.0, "[12ON] 06:00 - 18:00": 1.0, "[12OD] 18:00 - 06:00": 1.0, "[4O] 18:00 - 22:00": 1.0, "[8L] 06:00 - 14:00": 1.0, "[8L] 14:00 - 22:00": 1.0, "[8L] 22:00 - 06:00": 1.0, "[12L] 06:00 - 18:00": 1.0, "[12L] 18:00 - 06:00": 1.0, "[8L]": 1.0, "[8P]": 1.0, "[12P]": 1.0}, "[8P]": {"[12] 06:00 - 18:00": 1.0, "[12] 18:00 - 06:00": 1.0, "[12O] 06:00 - 18:00": 1.0, "[12O] 18:00 - 06:00": 1.0, "[8CN] 06:00 - 14:00": 1.0, "[8CN] 14:00 - 22:00": 1.0, "[8CN] 22:00 - 06:00": 1.0, "[12CN] 06:00 - 18:00": 1.0, "[12CN] 18:00 - 06:00": 1.0, "[8] 06:00 - 14:00": 1.0, "[8] 14:00 - 22:00": 1.0, "[8] 22:00 - 06:00": 1.0, "[8O] 06:00 - 14:00": 1.0, "[8O] 14:00 - 22:00": 1.0, "[8O] 22:00 - 06:00": 1.0, "[12ON] 06:00 - 18:00": 1.0, "[12OD] 18:00 - 06:00": 1.0, "[4O] 18:00 - 22:00": 1.0, "[8L] 06:00 - 14:00": 1.0, "[8L] 14:00 - 22:00": 1.0, "[8L] 22:00 - 06:00": 1.0, "[12L] 06:00 - 18:00": 1.0, "[12L] 18:00 - 06:00": 1.0, "[8L]": 1.0, "[8P]": 1.0, "[12P]": 1.0}, "[12P]": {"[12] 06:00 - 18:00": 1.0, "[12] 18:00 - 06:00": 1.0, "[12O] 06:00 - 18:00": 1.0, "[12O] 18:00 - 06:00": 1.0, "[8CN] 06:00 - 14:00": 1.0, "[8CN] 14:00 - 22:00": 1.0, "[8CN] 22:00 - 06:00": 1.0, "[12CN] 06:00 - 18:00": 1.0, "[12CN] 18:00 - 06:00": 1.0, "[8] 06:00 - 14:00": 1.0, "[8] 14:00 - 22:00": 1.0, "[8] 22:00 - 06:00": 1.0, "[8O] 06:00 - 14:00": 1.0, "[8O] 14:00 - 22:00": 1.0, "[8O] 22:00 - 06:00": 1.0, "[12ON] 06:00 - 18:00": 1.0, "[12OD] 18:00 - 06:00": 1.0, "[4O] 18:00 - 22:00": 1.0, "[8L] 06:00 - 14:00": 1.0, "[8L] 14:00 - 22:00": 1.0, "[8L] 22:00 - 06:00": 1.0, "[12L] 06:00 - 18:00": 1.0, "[12L] 18:00 - 06:00": 1.0, "[8L]": 1.0, "[8P]": 1.0, "[12P]": 1.0}};
 
 const SHIFT_MAP = {};
@@ -758,8 +829,20 @@ function getStorageKey() {
   return `payroll_offline_v1_${ym}`;
 }
 
+let saveBadgeTimer = null;
 function saveState() {
-  localStorage.setItem(getStorageKey(), JSON.stringify(state));
+  try {
+    localStorage.setItem(getStorageKey(), JSON.stringify(state));
+    localStorage.setItem(SELECTED_YM_KEY, getSelectedYM());
+    const badge = document.getElementById('saveStatusBadge');
+    if (badge) {
+      badge.textContent = '✓ Đã lưu';
+      clearTimeout(saveBadgeTimer);
+      saveBadgeTimer = setTimeout(() => {
+        badge.textContent = '● Tự động lưu';
+      }, 1500);
+    }
+  } catch (e) {}
 }
 
 function loadState() {
@@ -805,6 +888,7 @@ function showToast(msg) {
 
 function setViewMode(mode) {
   currentViewMode = mode;
+  localStorage.setItem(VIEW_MODE_KEY, mode);
   document.getElementById('btnViewMoney').classList.toggle('active', mode === 'Tiền');
   document.getElementById('btnViewHours').classList.toggle('active', mode === 'Giờ công');
   renderAll();
@@ -1068,34 +1152,28 @@ function clearCurrentMonth() {
 }
 
 function handleMonthChanged() {
-  state = {
-    shiftsByDate: {},
-    baseSalary: 0,
-    bhxhBase: 5700000,
-    allowTravel: 200000,
-    allowAttend: 200000,
-    allowHoliday: 0,
-    allowPhone: 14000
-  };
-  document.getElementById('inpBaseSalary').value = '';
-  document.getElementById('inpBHXH').value = formatNum(state.bhxhBase);
-  document.getElementById('inpAllowTravel').value = formatNum(state.allowTravel);
-  document.getElementById('inpAllowAttend').value = formatNum(state.allowAttend);
-  document.getElementById('inpAllowHoliday').value = formatNum(state.allowHoliday);
-  document.getElementById('inpAllowPhone').value = formatNum(state.allowPhone);
-  saveState();
+  localStorage.setItem(SELECTED_YM_KEY, getSelectedYM());
+  loadState();
   renderAll();
-  showToast('Đã đổi tháng và xóa dữ liệu kỳ lương này!');
+  showToast('Đã tải dữ liệu kỳ lương!');
 }
 
 const THEME_STORAGE_KEY = 'payroll_offline_theme_v1';
+const SELECTED_YM_KEY = 'payroll_offline_selected_ym_v1';
+const VIEW_MODE_KEY = 'payroll_offline_view_mode_v1';
+
+const ICON_SUN = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`;
+const ICON_MOON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`;
 
 function applyTheme(theme) {
   const isLight = theme === 'light';
   document.body.classList.toggle('light-theme', isLight);
   const btn = document.getElementById('btnThemeToggle');
   if (btn) {
-    btn.textContent = isLight ? '🌙 Giao diện tối' : '☀️ Giao diện sáng';
+    btn.innerHTML = isLight ? ICON_MOON : ICON_SUN;
+    const label = isLight ? 'Chuyển sang giao diện tối' : 'Chuyển sang giao diện sáng';
+    btn.title = label;
+    btn.setAttribute('aria-label', label);
   }
 }
 
@@ -1104,7 +1182,6 @@ function toggleTheme() {
   const nextTheme = isCurrentlyLight ? 'dark' : 'light';
   localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
   applyTheme(nextTheme);
-  showToast(nextTheme === 'light' ? 'Đã chuyển sang giao diện sáng!' : 'Đã chuyển sang giao diện tối!');
 }
 
 function loadTheme() {
@@ -1112,8 +1189,24 @@ function loadTheme() {
   applyTheme(saved === 'light' ? 'light' : 'dark');
 }
 
+function loadPreferences() {
+  const savedYM = localStorage.getItem(SELECTED_YM_KEY);
+  if (savedYM && /^\d{4}-\d{2}$/.test(savedYM)) {
+    document.getElementById('monthPicker').value = savedYM;
+    const [yStr] = savedYM.split('-');
+    pickerYear = parseInt(yStr, 10) || 2026;
+  }
+  const savedMode = localStorage.getItem(VIEW_MODE_KEY);
+  if (savedMode === 'Tiền' || savedMode === 'Giờ công') {
+    currentViewMode = savedMode;
+    document.getElementById('btnViewMoney').classList.toggle('active', savedMode === 'Tiền');
+    document.getElementById('btnViewHours').classList.toggle('active', savedMode === 'Giờ công');
+  }
+}
+
 // Init
 loadTheme();
+loadPreferences();
 syncMonthPickerUI();
 loadState();
 renderAll();
