@@ -265,10 +265,57 @@
 
   .shift-select {
     width: 100%; background: var(--input-bg); color: var(--select-text); border: 1px solid var(--border);
-    border-radius: 6px; padding: 5px 6px; font-size: 0.78rem; cursor: pointer;
-    margin-bottom: 6px;
+    border-radius: 6px; padding: 6px 8px; font-size: 0.78rem; font-weight: 600; cursor: pointer;
+    margin-bottom: 6px; transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
   }
   .shift-select:focus { border-color: var(--primary); outline: none; }
+  .shift-select option {
+    background: var(--surface);
+    color: var(--text);
+    font-weight: 600;
+  }
+  .shift-select.shift-tone-normal {
+    background: #0d9488;
+    border-color: #0f766e;
+    color: #ffffff;
+  }
+  .shift-select.shift-tone-leave {
+    background: #ea580c;
+    border-color: #c2410c;
+    color: #ffffff;
+  }
+  .shift-select.shift-tone-ot {
+    background: #d97706;
+    border-color: #b45309;
+    color: #ffffff;
+  }
+  .shift-select.shift-tone-sunday {
+    background: #dc2626;
+    border-color: #b91c1c;
+    color: #ffffff;
+  }
+  .shift-select.shift-tone-holiday {
+    background: #7c3aed;
+    border-color: #6d28d9;
+    color: #ffffff;
+  }
+  .shift-select.shift-tone-filled {
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.45);
+  }
+  .chip-undo {
+    background: rgba(245, 158, 11, 0.14);
+    border-color: rgba(245, 158, 11, 0.55);
+    color: var(--ot-color);
+    font-weight: 600;
+  }
+  .chip-undo:hover:not(:disabled) {
+    background: rgba(245, 158, 11, 0.25);
+    border-color: var(--ot-color);
+  }
+  .chip-undo:disabled {
+    opacity: 0.42;
+    cursor: not-allowed;
+  }
   
   .day-desc {
     font-size: 0.72rem; color: var(--text-muted); min-height: 28px;
@@ -561,14 +608,14 @@
         <button id="btnViewHours" onclick="setViewMode('Giờ công')">Xem Giờ quy đổi</button>
       </div>
       <button type="button" class="btn btn-icon" id="btnThemeToggle" onclick="toggleTheme()" title="Chuyển giao diện sáng / tối" aria-label="Chuyển giao diện sáng / tối"></button>
-      <button class="btn btn-danger" onclick="clearCurrentMonth()">Xóa tháng này</button>
+      <button class="btn btn-danger" onclick="clearCurrentMonth()">Xóa dữ liệu</button>
     </div>
   </div>
 
   <div class="quickbar">
     <span>Điền nhanh :</span>
-    <button class="chip" onclick="quickFill48hHalfNight()">+ Điền đủ công 48h (2 Ngày + 2 Đêm; tuần lẻ T2–T7 → [8] 06:00 - 14:00)</button>
-    <button class="chip" onclick="quickFill8hWeekday()">+ Điền hành chính [8] 06:00 - 14:00 (T2–T7)</button>
+    <button class="chip" id="btnAutoFill" onclick="quickAutoFillCycle()">+ Tự động điền ca kỳ công (48h/tuần)</button>
+    <button class="chip chip-undo" id="btnUndoFill" onclick="undoLastAutoFill()" disabled title="Hoàn tác các ngày vừa được tự động điền">↺ Hoàn tác lần fill gần nhất</button>
   </div>
 
   <div class="calendar-wrapper">
@@ -714,6 +761,7 @@ let pickerYear = 2026;
 let currentViewMode = 'Tiền'; // 'Tiền' or 'Giờ công'
 let state = {
   shiftsByDate: {}, // 'YYYY-MM-DD': shiftCode
+  lastAutoFillDates: [],
   baseSalary: 0,
   bhxhBase: 5700000,
   allowTravel: 200000,
@@ -853,6 +901,7 @@ function loadState() {
       const parsed = JSON.parse(raw);
       state = Object.assign({
         shiftsByDate: {},
+        lastAutoFillDates: [],
         baseSalary: 0,
         bhxhBase: 5700000,
         allowTravel: 200000,
@@ -864,6 +913,7 @@ function loadState() {
   } else {
     state = {
       shiftsByDate: {},
+      lastAutoFillDates: [],
       baseSalary: 0,
       bhxhBase: 5700000,
       allowTravel: 200000,
@@ -1023,12 +1073,19 @@ function renderAll() {
       }
     }
 
-    // Options HTML
+    // Options HTML: Sunday only shows [8CN] and [12CN] shifts
+    const availableShifts = isSun
+      ? SHIFTS.filter(s => s.code.includes('[8CN]') || s.code.includes('[12CN]'))
+      : SHIFTS;
     let opts = `<option value="">-- Nghỉ / Trống --</option>`;
-    SHIFTS.forEach(s => {
+    availableShifts.forEach(s => {
       const sel = (s.code === selectedCode) ? 'selected' : '';
       opts += `<option value="${s.code}" ${sel}>${s.code}</option>`;
     });
+
+    const shiftToneClass = getShiftToneClass(selectedCode, shiftObj);
+    const isRecentlyFilled = Array.isArray(state.lastAutoFillDates) && state.lastAutoFillDates.includes(iso);
+    const selectClasses = ['shift-select', shiftToneClass, isRecentlyFilled ? 'shift-tone-filled' : ''].filter(Boolean).join(' ');
 
     const descText = shiftObj ? shiftObj.desc : (inCycle && iso < todayStr ? 'Ngày nghỉ (OFF)' : '');
     let valHtml = `<div class="day-val empty">—</div>`;
@@ -1047,7 +1104,7 @@ function renderAll() {
             <span class="date-badge">${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}</span>
             ${badgeText ? `<span class="tag-type ${badgeClass}">${badgeText}</span>` : ''}
           </div>
-          <select class="shift-select" onchange="onShiftChange('${iso}', this.value)" ${!inCycle ? 'disabled' : ''}>
+          <select class="${selectClasses}" onchange="onShiftChange('${iso}', this.value)" ${!inCycle ? 'disabled' : ''}>
             ${opts}
           </select>
           <div class="day-desc" title="${descText}">${descText}</div>
@@ -1057,6 +1114,7 @@ function renderAll() {
     `;
   }
   document.getElementById('calendarGrid').innerHTML = html;
+  syncUndoButtonState();
 
   // 3. Summary Formulas matching Sheet6
   const actualHours = stdHours - (count8P * 8) - (count12P * 12);
@@ -1116,7 +1174,26 @@ function getWeekKey(d) {
   return toISODate(sun);
 }
 
-function quickFill48hHalfNight() {
+function getShiftToneClass(code, shiftObj) {
+  if (!code || !shiftObj) return '';
+  if (code.includes('[8P]') || code.includes('[12P]')) return 'shift-tone-leave';
+  if (code.includes('[8CN]') || code.includes('[12CN]') || shiftObj.day_type === 'CN') return 'shift-tone-sunday';
+  if (shiftObj.day_type === 'L') return 'shift-tone-holiday';
+  if (shiftObj.day_type === 'O') return 'shift-tone-ot';
+  return 'shift-tone-normal';
+}
+
+function syncUndoButtonState() {
+  const btn = document.getElementById('btnUndoFill');
+  if (!btn) return;
+  const count = Array.isArray(state.lastAutoFillDates) ? state.lastAutoFillDates.length : 0;
+  btn.disabled = count === 0;
+  btn.textContent = count > 0
+    ? `↺ Hoàn tác lần fill (${count} ngày)`
+    : '↺ Hoàn tác lần fill gần nhất';
+}
+
+function quickAutoFillCycle() {
   const { startDate, endDate } = getCycleDates();
   const weekPattern = [
     '[12] 06:00 - 18:00',
@@ -1144,13 +1221,13 @@ function quickFill48hHalfNight() {
 
   // 2. Fill each week: if the week does NOT have all 6 days (Mon..Sat) inside the cycle,
   // fill Mon..Sat days in that week with '[8] 06:00 - 14:00'; otherwise use the 48h pattern.
-  let filled = 0;
+  const filledDates = [];
   let partialWeeksCount = 0;
   let partialDaysFilled = 0;
 
   const sortedWeeks = Object.keys(weekMonToSat).sort();
   sortedWeeks.forEach(wk => {
-    const daysInWeek = weekMonToSat[wk]; // already sorted chronologically, each has dow in 1..6
+    const daysInWeek = weekMonToSat[wk];
     const isCompleteMonToSat = (daysInWeek.length === 6);
 
     if (!isCompleteMonToSat) {
@@ -1159,7 +1236,7 @@ function quickFill48hHalfNight() {
         const iso = toISODate(dObj);
         if (!state.shiftsByDate[iso]) {
           state.shiftsByDate[iso] = '[8] 06:00 - 14:00';
-          filled++;
+          filledDates.push(iso);
           partialDaysFilled++;
         }
       });
@@ -1169,47 +1246,51 @@ function quickFill48hHalfNight() {
         const assignedShift = weekPattern[idx % 6];
         if (!state.shiftsByDate[iso] && assignedShift) {
           state.shiftsByDate[iso] = assignedShift;
-          filled++;
+          filledDates.push(iso);
         }
       });
     }
   });
 
+  if (filledDates.length > 0) {
+    state.lastAutoFillDates = filledDates;
+  }
+
   saveState();
   renderAll();
-  if (partialWeeksCount > 0) {
-    showToast(`Đã điền ${filled} ca (${partialDaysFilled} ngày ở ${partialWeeksCount} tuần lẻ T2–T7 → [8] 06:00 - 14:00)!`);
+  syncUndoButtonState();
+
+  if (filledDates.length === 0) {
+    showToast('Không có ô trống nào cần điền thêm!');
+  } else if (partialWeeksCount > 0) {
+    showToast(`Đã điền ${filledDates.length} ngày (${partialDaysFilled} ngày tuần lẻ → [8] 06:00 - 14:00)!`);
   } else {
-    showToast(`Đã điền ${filled} ca theo chuẩn 48h/tuần (nửa ca đêm)!`);
+    showToast(`Đã điền ${filledDates.length} ca theo chuẩn 48h/tuần!`);
   }
 }
 
-function quickFill8hWeekday() {
-  const { startDate, endDate } = getCycleDates();
-  let cur = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
-  const endNorm = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
-  let filled = 0;
+function undoLastAutoFill() {
+  const dates = Array.isArray(state.lastAutoFillDates) ? state.lastAutoFillDates : [];
+  if (!dates.length) return;
 
-  while (cur <= endNorm) {
-    const dow = cur.getDay();
-    if (dow >= 1 && dow <= 6) {
-      const iso = toISODate(cur);
-      if (!state.shiftsByDate[iso]) {
-        state.shiftsByDate[iso] = '[8] 06:00 - 14:00';
-        filled++;
-      }
+  let reverted = 0;
+  dates.forEach(iso => {
+    if (state.shiftsByDate[iso]) {
+      delete state.shiftsByDate[iso];
+      reverted++;
     }
-    cur.setDate(cur.getDate() + 1);
-  }
-
+  });
+  state.lastAutoFillDates = [];
   saveState();
   renderAll();
-  showToast(`Đã điền ${filled} ca [8] 06:00 - 14:00 cho các ngày T2–T7 trống!`);
+  syncUndoButtonState();
+  showToast(`Đã hoàn tác ${reverted} ngày vừa tự động điền!`);
 }
 
 function clearCurrentMonth() {
   if (!confirm('Bạn có chắc muốn xóa toàn bộ ca chấm công của kỳ lương này?')) return;
   state.shiftsByDate = {};
+  state.lastAutoFillDates = [];
   saveState();
   renderAll();
   showToast('Đã xóa dữ liệu tháng!');
