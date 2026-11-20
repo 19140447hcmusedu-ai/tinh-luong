@@ -567,7 +567,8 @@
 
   <div class="quickbar">
     <span>Điền nhanh :</span>
-    <button class="chip" onclick="quickFill48hHalfNight()">+ Điền đủ công 48h (2 Ngày + 2 Đêm)</button>
+    <button class="chip" onclick="quickFill48hHalfNight()">+ Điền đủ công 48h (2 Ngày + 2 Đêm; tuần lẻ T2–T7 → [8] 06:00 - 14:00)</button>
+    <button class="chip" onclick="quickFill8hWeekday()">+ Điền hành chính [8] 06:00 - 14:00 (T2–T7)</button>
   </div>
 
   <div class="calendar-wrapper">
@@ -1109,6 +1110,12 @@ function onShiftChange(iso, code) {
   renderAll();
 }
 
+function getWeekKey(d) {
+  // Week bucket anchored on Sunday..Saturday (matching calendar grid columns)
+  const sun = new Date(d.getFullYear(), d.getMonth(), d.getDate() - d.getDay());
+  return toISODate(sun);
+}
+
 function quickFill48hHalfNight() {
   const { startDate, endDate } = getCycleDates();
   const weekPattern = [
@@ -1120,18 +1127,75 @@ function quickFill48hHalfNight() {
     ''
   ];
 
-  let cur = new Date(startDate);
-  let workDayIndex = 0;
+  // 1. Group Mon-Sat (getDay() 1..6) dates that fall inside the current cycle by week
+  const weekMonToSat = {};
+  let scan = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+  const endNorm = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+
+  while (scan <= endNorm) {
+    const dow = scan.getDay(); // 0=Sun, 1=Mon .. 6=Sat
+    if (dow >= 1 && dow <= 6) {
+      const wk = getWeekKey(scan);
+      if (!weekMonToSat[wk]) weekMonToSat[wk] = [];
+      weekMonToSat[wk].push(new Date(scan.getFullYear(), scan.getMonth(), scan.getDate()));
+    }
+    scan.setDate(scan.getDate() + 1);
+  }
+
+  // 2. Fill each week: if the week does NOT have all 6 days (Mon..Sat) inside the cycle,
+  // fill Mon..Sat days in that week with '[8] 06:00 - 14:00'; otherwise use the 48h pattern.
+  let filled = 0;
+  let partialWeeksCount = 0;
+  let partialDaysFilled = 0;
+
+  const sortedWeeks = Object.keys(weekMonToSat).sort();
+  sortedWeeks.forEach(wk => {
+    const daysInWeek = weekMonToSat[wk]; // already sorted chronologically, each has dow in 1..6
+    const isCompleteMonToSat = (daysInWeek.length === 6);
+
+    if (!isCompleteMonToSat) {
+      partialWeeksCount++;
+      daysInWeek.forEach(dObj => {
+        const iso = toISODate(dObj);
+        if (!state.shiftsByDate[iso]) {
+          state.shiftsByDate[iso] = '[8] 06:00 - 14:00';
+          filled++;
+          partialDaysFilled++;
+        }
+      });
+    } else {
+      daysInWeek.forEach((dObj, idx) => {
+        const iso = toISODate(dObj);
+        const assignedShift = weekPattern[idx % 6];
+        if (!state.shiftsByDate[iso] && assignedShift) {
+          state.shiftsByDate[iso] = assignedShift;
+          filled++;
+        }
+      });
+    }
+  });
+
+  saveState();
+  renderAll();
+  if (partialWeeksCount > 0) {
+    showToast(`Đã điền ${filled} ca (${partialDaysFilled} ngày ở ${partialWeeksCount} tuần lẻ T2–T7 → [8] 06:00 - 14:00)!`);
+  } else {
+    showToast(`Đã điền ${filled} ca theo chuẩn 48h/tuần (nửa ca đêm)!`);
+  }
+}
+
+function quickFill8hWeekday() {
+  const { startDate, endDate } = getCycleDates();
+  let cur = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+  const endNorm = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
   let filled = 0;
 
-  while (cur <= endDate) {
-    if (cur.getDay() !== 0) {
+  while (cur <= endNorm) {
+    const dow = cur.getDay();
+    if (dow >= 1 && dow <= 6) {
       const iso = toISODate(cur);
-      const assignedShift = weekPattern[workDayIndex % 6];
-      workDayIndex++;
-
-      if (!state.shiftsByDate[iso] && assignedShift) {
-        state.shiftsByDate[iso] = assignedShift;
+      if (!state.shiftsByDate[iso]) {
+        state.shiftsByDate[iso] = '[8] 06:00 - 14:00';
         filled++;
       }
     }
@@ -1140,7 +1204,7 @@ function quickFill48hHalfNight() {
 
   saveState();
   renderAll();
-  showToast(`Đã điền ${filled} ca theo chuẩn 48h/tuần (nửa ca đêm)!`);
+  showToast(`Đã điền ${filled} ca [8] 06:00 - 14:00 cho các ngày T2–T7 trống!`);
 }
 
 function clearCurrentMonth() {
