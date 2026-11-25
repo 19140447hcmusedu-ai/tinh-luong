@@ -221,6 +221,67 @@
     padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; transition: 0.15s;
   }
   .chip:hover { border-color: var(--primary); color: var(--title-color); }
+  .chip-json {
+    background: rgba(59, 130, 246, 0.14);
+    border-color: rgba(59, 130, 246, 0.5);
+    color: var(--cur-month-text);
+    font-weight: 600;
+  }
+  .chip-json:hover {
+    background: rgba(59, 130, 246, 0.24);
+    border-color: var(--primary);
+  }
+
+  /* JSON Paste Modal */
+  .modal-backdrop {
+    display: none; position: fixed; inset: 0; background: rgba(2, 6, 23, 0.72);
+    z-index: 900; align-items: center; justify-content: center; padding: 16px;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal-card {
+    width: 100%; max-width: 680px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 14px; padding: 18px;
+    box-shadow: var(--popover-shadow); display: flex; flex-direction: column; gap: 12px;
+    max-height: 90vh; overflow-y: auto;
+  }
+  .modal-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-bottom: 10px; border-bottom: 1px solid var(--border);
+  }
+  .modal-head h3 { font-size: 1.02rem; font-weight: 700; color: var(--title-color); }
+  .modal-close {
+    background: var(--surface2); color: var(--text); border: 1px solid var(--border);
+    width: 30px; height: 30px; border-radius: 8px; cursor: pointer; font-weight: 700;
+  }
+  .modal-close:hover { background: var(--hover-surface); }
+  .json-textarea {
+    width: 100%; min-height: 190px; background: var(--input-bg); color: var(--input-text);
+    border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.78rem; line-height: 1.45; resize: vertical; outline: none;
+  }
+  .json-textarea:focus { border-color: var(--primary); }
+  .modal-options {
+    display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.82rem; color: var(--header-text);
+  }
+  .modal-options label {
+    display: inline-flex; align-items: center; gap: 6px; cursor: pointer; user-select: none;
+  }
+  .modal-status {
+    font-size: 0.8rem; padding: 8px 10px; border-radius: 8px;
+    background: var(--surface2); border: 1px solid var(--border); color: var(--text-muted);
+  }
+  .modal-status.ok {
+    border-color: rgba(16, 185, 129, 0.45); color: var(--accent);
+    background: rgba(16, 185, 129, 0.08);
+  }
+  .modal-status.err {
+    border-color: rgba(239, 68, 68, 0.45); color: var(--deduct-color);
+    background: rgba(239, 68, 68, 0.08);
+  }
+  .modal-actions {
+    display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; padding-top: 4px;
+  }
 
   /* Calendar Grid */
   .calendar-wrapper {
@@ -614,6 +675,7 @@
 
   <div class="quickbar">
     <span>Điền nhanh :</span>
+    <button class="chip chip-json" id="btnLoadJsonClipboard" onclick="loadJsonFromClipboardDirect()">⚡ Nạp dữ liệu</button>
     <button class="chip" id="btnAutoFill" onclick="quickAutoFillCycle()">+ Tự động điền ca kỳ công (48h/tuần)</button>
     <button class="chip chip-undo" id="btnUndoFill" onclick="undoLastAutoFill()" disabled title="Hoàn tác các ngày vừa được tự động điền">↺ Hoàn tác lần điền gần nhất</button>
   </div>
@@ -852,7 +914,9 @@ document.addEventListener('click', (e) => {
 });
 
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeMonthPopover();
+  if (e.key === 'Escape') {
+    closeMonthPopover();
+  }
 });
 
 function formatNum(n) {
@@ -1296,6 +1360,251 @@ function undoLastAutoFill() {
   renderAll();
   syncUndoButtonState();
   showToast(`Đã hoàn tác ${reverted} ngày vừa tự động điền!`);
+}
+
+function normalizeIsoDate(raw) {
+  if (!raw) return '';
+  const s = String(raw).trim();
+  let m = s.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+  if (m) {
+    return `${m[1]}-${String(parseInt(m[2], 10)).padStart(2, '0')}-${String(parseInt(m[3], 10)).padStart(2, '0')}`;
+  }
+  m = s.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
+  if (m) {
+    return `${m[3]}-${String(parseInt(m[2], 10)).padStart(2, '0')}-${String(parseInt(m[1], 10)).padStart(2, '0')}`;
+  }
+  return '';
+}
+
+function normalizeTimeRange(raw) {
+  const s = String(raw || '');
+  const matches = Array.from(s.matchAll(/(\d{1,2})\s*:\s*(\d{2})\s*[-–~to]+\s*(\d{1,2})\s*:\s*(\d{2})/gi));
+  if (!matches.length) return '';
+  const pick = matches.length > 1 ? matches[matches.length - 1] : matches[0];
+  const h1 = String(parseInt(pick[1], 10)).padStart(2, '0');
+  const m1 = pick[2];
+  const h2 = String(parseInt(pick[3], 10)).padStart(2, '0');
+  const m2 = pick[4];
+  return `${h1}:${m1} - ${h2}:${m2}`;
+}
+
+function mapRawEntryToShiftCode(entry, isSunday) {
+  const rawCode = typeof entry === 'string'
+    ? entry
+    : (entry.shiftCode || entry.code || entry.CA || entry.ca || '');
+  if (rawCode && SHIFT_MAP[String(rawCode).trim()]) {
+    const candidate = String(rawCode).trim();
+    const isSunShift = candidate.includes('[8CN]') || candidate.includes('[12CN]');
+    if (isSunday && isSunShift) return candidate;
+    if (!isSunday && !isSunShift) return candidate;
+  }
+
+  const lines = Array.isArray(entry && entry.lines)
+    ? entry.lines.map(x => String(x))
+    : [
+        rawCode,
+        entry && entry.desc,
+        entry && entry.REASON,
+        entry && entry.TIME_CHECK,
+        entry && entry.TOTAL_OT,
+        entry && entry.WORKINGDAY
+      ].filter(Boolean).map(String);
+
+  const joined = lines.join(' | ');
+  const upper = joined.toUpperCase();
+
+  if (/OFF|NGHỈ PHÉP|NGHỈ KHÔNG LƯƠNG|KL|VẮNG MẶT|CHƯA CÓ CÔNG/.test(upper) && !/\d{1,2}:\d{2}/.test(upper)) {
+    return '';
+  }
+
+  const timeRange = normalizeTimeRange(joined);
+  const hasHolidayTag = /\[L\]|NGHỈ LỄ|LỄ|TẾT/.test(upper);
+  const hasPaidLeaveTag = /\[8P\]|\[12P\]|PHÉP|AL|NGHỈ CÓ LƯƠNG/.test(upper);
+  const hasOTTag = /\[12O\]|\[8O\]|\[4O\]|OT|TĂNG CA|CANM_OT|OT NGÀY|OT ĐÊM/.test(upper);
+
+  if (hasPaidLeaveTag && !timeRange) {
+    return /12/.test(upper) ? '[12P]' : '[8P]';
+  }
+
+  if (isSunday) {
+    const pool = SHIFTS.filter(s => s.code.includes('[8CN]') || s.code.includes('[12CN]'));
+    if (timeRange) {
+      const exact = pool.find(s => s.code.endsWith(timeRange));
+      if (exact) return exact.code;
+    }
+    if (/06:00.*18:00|18:00.*06:00|12/.test(upper)) {
+      return /18:00.*06:00/.test(timeRange || upper) ? '[12CN] 18:00 - 06:00' : '[12CN] 06:00 - 18:00';
+    }
+    if (/22:00.*06:00/.test(timeRange || upper)) return '[8CN] 22:00 - 06:00';
+    if (/14:00.*22:00/.test(timeRange || upper)) return '[8CN] 14:00 - 22:00';
+    return '[8CN] 06:00 - 14:00';
+  }
+
+  if (!timeRange) {
+    if (hasHolidayTag) return '[8L]';
+    return '';
+  }
+
+  const nonSunPool = SHIFTS.filter(s => s.day_type !== 'CN' && !s.code.includes('[8CN]') && !s.code.includes('[12CN]'));
+
+  if (hasHolidayTag) {
+    const hMatch = nonSunPool.find(s => s.day_type === 'L' && s.code.endsWith(timeRange));
+    if (hMatch) return hMatch.code;
+  }
+
+  if (hasOTTag) {
+    if (timeRange === '18:00 - 06:00') {
+      if (/12OD|VẮT CA|ĐÊM/.test(upper) && !/OT ĐÊM\s*:\s*8/.test(upper)) {
+        const od = nonSunPool.find(s => s.code === '[12OD] 18:00 - 06:00');
+        if (od) return od.code;
+      }
+      const o12n = nonSunPool.find(s => s.code === '[12O] 18:00 - 06:00');
+      if (o12n) return o12n.code;
+    }
+    if (timeRange === '06:00 - 18:00') {
+      if (/12ON/.test(upper)) {
+        const on = nonSunPool.find(s => s.code === '[12ON] 06:00 - 18:00');
+        if (on) return on.code;
+      }
+      const o12d = nonSunPool.find(s => s.code === '[12O] 06:00 - 18:00');
+      if (o12d) return o12d.code;
+    }
+    const oMatch = nonSunPool.find(s => s.day_type === 'O' && s.code.endsWith(timeRange));
+    if (oMatch) return oMatch.code;
+  }
+
+  const tMatch = nonSunPool.find(s => s.day_type === 'T' && s.code.endsWith(timeRange));
+  if (tMatch) return tMatch.code;
+
+  const anyMatch = nonSunPool.find(s => s.code.endsWith(timeRange));
+  return anyMatch ? anyMatch.code : '';
+}
+
+function parseHiStaffJsonText(rawText) {
+  const trimmed = (rawText || '').trim();
+  if (!trimmed) {
+    return { valid: false, error: 'Vui lòng dán nội dung JSON trước.' };
+  }
+
+  let parsed;
+  try {
+    parsed = JSON.parse(trimmed);
+  } catch (err) {
+    return { valid: false, error: `JSON không hợp lệ: ${err.message}` };
+  }
+
+  const records = [];
+  if (Array.isArray(parsed)) {
+    parsed.forEach(item => {
+      if (item && typeof item === 'object') {
+        const dt = normalizeIsoDate(item.date || item.DATE || item.workDate || item.day);
+        if (dt) records.push({ date: dt, entry: item });
+      }
+    });
+  } else if (parsed && typeof parsed === 'object') {
+    if (Array.isArray(parsed.shifts)) {
+      parsed.shifts.forEach(item => {
+        if (item && typeof item === 'object') {
+          const dt = normalizeIsoDate(item.date || item.DATE || item.workDate || item.day);
+          if (dt) records.push({ date: dt, entry: item });
+        }
+      });
+    } else if (parsed.shiftsByDate && typeof parsed.shiftsByDate === 'object') {
+      Object.entries(parsed.shiftsByDate).forEach(([k, v]) => {
+        const dt = normalizeIsoDate(k);
+        if (dt) records.push({ date: dt, entry: v });
+      });
+    } else {
+      Object.entries(parsed).forEach(([k, v]) => {
+        const dt = normalizeIsoDate(k);
+        if (dt) records.push({ date: dt, entry: v });
+      });
+    }
+  }
+
+  if (!records.length) {
+    return { valid: false, error: 'Không tìm thấy dữ liệu ngày công hợp lệ (cần định dạng ngày YYYY-MM-DD hoặc DD/MM/YYYY).' };
+  }
+
+  let inferredYM = '';
+  const periodStr = String((parsed && (parsed.period || parsed.cycle)) || '');
+  const endStr = normalizeIsoDate(parsed && parsed.end);
+  if (endStr) {
+    inferredYM = endStr.slice(0, 7);
+  } else {
+    const pm = periodStr.match(/(\d{1,2})\s*\/\s*(\d{4})/);
+    if (pm) {
+      inferredYM = `${pm[2]}-${String(parseInt(pm[1], 10)).padStart(2, '0')}`;
+    } else {
+      inferredYM = records[0].date.slice(0, 7);
+    }
+  }
+
+  return { valid: true, records, inferredYM };
+}
+
+function applyParsedJsonRecords(parsedRes, overwrite = true, autoSwitch = true) {
+  if (autoSwitch && parsedRes.inferredYM && /^\d{4}-\d{2}$/.test(parsedRes.inferredYM) && parsedRes.inferredYM !== getSelectedYM()) {
+    document.getElementById('monthPicker').value = parsedRes.inferredYM;
+    const [yStr] = parsedRes.inferredYM.split('-');
+    pickerYear = parseInt(yStr, 10) || pickerYear;
+    syncMonthPickerUI();
+    loadState();
+  }
+
+  const { startDate, endDate } = getCycleDates();
+  const startIso = toISODate(startDate);
+  const endIso = toISODate(endDate);
+  const touchedDates = [];
+  let appliedCount = 0;
+
+  parsedRes.records.forEach(({ date, entry }) => {
+    if (date < startIso || date > endIso) return;
+    if (!overwrite && state.shiftsByDate[date]) return;
+
+    const [y, m, d] = date.split('-').map(Number);
+    const dow = new Date(y, m - 1, d).getDay();
+    const mappedCode = mapRawEntryToShiftCode(entry, dow === 0);
+
+    if (mappedCode) {
+      state.shiftsByDate[date] = mappedCode;
+      touchedDates.push(date);
+      appliedCount++;
+    } else if (overwrite) {
+      delete state.shiftsByDate[date];
+    }
+  });
+
+  if (touchedDates.length > 0) {
+    state.lastAutoFillDates = touchedDates;
+  }
+
+  saveState();
+  renderAll();
+  syncUndoButtonState();
+  showToast(`Đã nạp ${appliedCount} ca vào kỳ ${getSelectedYM()}!`);
+}
+
+async function loadJsonFromClipboardDirect() {
+  if (!navigator.clipboard || !navigator.clipboard.readText) {
+    showToast('Trình duyệt không hỗ trợ đọc Clipboard tự động.');
+    return;
+  }
+  let text = '';
+  try {
+    text = await navigator.clipboard.readText();
+  } catch (e) {
+    showToast('Không đọc được Clipboard. Hãy cấp quyền truy cập Clipboard.');
+    return;
+  }
+
+  const parsedRes = parseHiStaffJsonText(text);
+  if (!parsedRes.valid) {
+    showToast(parsedRes.error || 'Clipboard không chứa JSON hợp lệ!');
+    return;
+  }
+
+  applyParsedJsonRecords(parsedRes, true, true);
 }
 
 function clearCurrentMonth() {
