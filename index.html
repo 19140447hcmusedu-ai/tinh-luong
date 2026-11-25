@@ -1035,16 +1035,20 @@ function getCycleDates() {
   // End: 25th of selected month
   const endDate = new Date(year, month - 1, 25);
   
-  // Grid start: Sunday on or before 25th of previous month (matching Excel R10 logic)
-  const anchor25 = new Date(year, month - 2, 25);
-  const gridStart = new Date(anchor25);
-  gridStart.setDate(anchor25.getDate() - anchor25.getDay());
-  
-  // Build 5 weeks (35 days)
+  // Grid start: Sunday on or before startDate (26th of previous month)
+  const gridStart = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+  gridStart.setDate(gridStart.getDate() - gridStart.getDay());
+
+  // Grid end: Saturday on or after endDate (25th of selected month)
+  const gridEnd = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+  gridEnd.setDate(gridEnd.getDate() + (6 - gridEnd.getDay()));
+
+  // Build up to 6 weeks (max 42 days) so the entire cycle [26/(m-1) .. 25/m] always fits
+  const totalDaysRaw = Math.round((gridEnd - gridStart) / 86400000) + 1;
+  const totalGridDays = Math.min(42, Math.max(28, totalDaysRaw));
   const gridDates = [];
-  for (let i = 0; i < 35; i++) {
-    const d = new Date(gridStart);
-    d.setDate(gridStart.getDate() + i);
+  for (let i = 0; i < totalGridDays; i++) {
+    const d = new Date(gridStart.getFullYear(), gridStart.getMonth(), gridStart.getDate() + i);
     gridDates.push(d);
   }
   
