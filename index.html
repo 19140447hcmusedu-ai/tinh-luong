@@ -1134,8 +1134,8 @@ function renderAll() {
       if (selectedCode === '[12OD] 18:00 - 06:00') count12ODNight++;
       if (selectedCode.includes('[12O] 18:00 - 06:00')) count12ONight++;
       if (
-        selectedCode.startsWith('[8CN]') ||
-        selectedCode.startsWith('[8O]') ||
+        selectedCode === '[8CN] 22:00 - 06:00' ||
+        selectedCode === '[8O] 22:00 - 06:00' ||
         selectedCode === '[8] 22:00 - 06:00'
       ) {
         countExtraMealShifts++;
