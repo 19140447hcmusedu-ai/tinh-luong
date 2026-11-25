@@ -1480,6 +1480,61 @@ function mapRawEntryToShiftCode(entry, isSunday) {
   return anyMatch ? anyMatch.code : '';
 }
 
+function inferCycleYMFromRecords(records, parsedObj) {
+  const getCycleContainingDate = (iso) => {
+    const m = String(iso || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!m) return '';
+    const y = parseInt(m[1], 10);
+    const mo = parseInt(m[2], 10);
+    const day = parseInt(m[3], 10);
+    // Chu kỳ của tháng (y, mo) là 26/(mo-1) -> 25/mo.
+    // Nếu ngày >= 26 thì thuộc chu kỳ của tháng kế tiếp (mo + 1).
+    let targetY = y;
+    let targetM = mo + (day >= 26 ? 1 : 0);
+    if (targetM > 12) {
+      targetM -= 12;
+      targetY += 1;
+    }
+    return `${targetY}-${String(targetM).padStart(2, '0')}`;
+  };
+
+  if (parsedObj && typeof parsedObj === 'object') {
+    const explicitYM = String(parsedObj.cycleYM || parsedObj.ym || '').trim();
+    if (/^\d{4}-\d{2}$/.test(explicitYM)) return explicitYM;
+
+    const endStr = normalizeIsoDate(parsedObj.end);
+    if (endStr) return getCycleContainingDate(endStr);
+
+    const startStr = normalizeIsoDate(parsedObj.start);
+    if (startStr) return getCycleContainingDate(startStr);
+
+    const periodStr = String(parsedObj.period || parsedObj.cycle || '');
+    const pm = periodStr.match(/(\d{1,2})\s*\/\s*(\d{4})/);
+    if (pm) {
+      return `${pm[2]}-${String(parseInt(pm[1], 10)).padStart(2, '0')}`;
+    }
+  }
+
+  if (Array.isArray(records) && records.length > 0) {
+    const voteCounts = {};
+    records.forEach(({ date }) => {
+      const cyc = getCycleContainingDate(date);
+      if (cyc) voteCounts[cyc] = (voteCounts[cyc] || 0) + 1;
+    });
+    let bestCyc = '';
+    let bestCount = -1;
+    Object.entries(voteCounts).forEach(([cyc, cnt]) => {
+      if (cnt > bestCount) {
+        bestCount = cnt;
+        bestCyc = cyc;
+      }
+    });
+    if (bestCyc) return bestCyc;
+  }
+
+  return '';
+}
+
 function parseHiStaffJsonText(rawText) {
   const trimmed = (rawText || '').trim();
   if (!trimmed) {
@@ -1526,21 +1581,12 @@ function parseHiStaffJsonText(rawText) {
     return { valid: false, error: 'Không tìm thấy dữ liệu ngày công hợp lệ (cần định dạng ngày YYYY-MM-DD hoặc DD/MM/YYYY).' };
   }
 
-  let inferredYM = '';
-  const periodStr = String((parsed && (parsed.period || parsed.cycle)) || '');
-  const endStr = normalizeIsoDate(parsed && parsed.end);
-  if (endStr) {
-    inferredYM = endStr.slice(0, 7);
-  } else {
-    const pm = periodStr.match(/(\d{1,2})\s*\/\s*(\d{4})/);
-    if (pm) {
-      inferredYM = `${pm[2]}-${String(parseInt(pm[1], 10)).padStart(2, '0')}`;
-    } else {
-      inferredYM = records[0].date.slice(0, 7);
-    }
-  }
+  const inferredYM = inferCycleYMFromRecords(records, parsed);
+  const periodLabel = (parsed && typeof parsed === 'object' && (parsed.period || parsed.cycle))
+    ? String(parsed.period || parsed.cycle).trim()
+    : '';
 
-  return { valid: true, records, inferredYM };
+  return { valid: true, records, inferredYM, periodLabel };
 }
 
 function applyParsedJsonRecords(parsedRes, overwrite = true, autoSwitch = true) {
@@ -1549,6 +1595,7 @@ function applyParsedJsonRecords(parsedRes, overwrite = true, autoSwitch = true) 
     const [yStr] = parsedRes.inferredYM.split('-');
     pickerYear = parseInt(yStr, 10) || pickerYear;
     syncMonthPickerUI();
+    localStorage.setItem(SELECTED_YM_KEY, getSelectedYM());
     loadState();
   }
 
@@ -1582,7 +1629,9 @@ function applyParsedJsonRecords(parsedRes, overwrite = true, autoSwitch = true) 
   saveState();
   renderAll();
   syncUndoButtonState();
-  showToast(`Đã nạp ${appliedCount} ca vào kỳ ${getSelectedYM()}!`);
+  const [, ymM] = getSelectedYM().split('-');
+  const cycText = parsedRes.periodLabel ? `${parsedRes.periodLabel} (Tháng ${parseInt(ymM, 10)})` : `Tháng ${parseInt(ymM, 10)}`;
+  showToast(`Đã nạp ${appliedCount} ca vào kỳ ${cycText}!`);
 }
 
 async function loadJsonFromClipboardDirect() {
