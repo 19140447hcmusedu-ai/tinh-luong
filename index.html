@@ -1078,7 +1078,7 @@ function renderAll() {
 
   // 2. Scan active shifts in cycle for summary metrics
   let count8P = 0, count12P = 0;
-  let count12Day = 0, count12Night = 0, count8Night = 0, count12ODNight = 0, count12ONight = 0;
+  let count12Day = 0, count12Night = 0, count8Night = 0, count12ODNight = 0, count12ONight = 0, countExtraMealShifts = 0;
   let totalOTHours = 0;
   let sumNonTConvertedHours = 0;
   let stateMutated = false;
@@ -1133,6 +1133,13 @@ function renderAll() {
       if (selectedCode === '[8] 22:00 - 06:00') count8Night++;
       if (selectedCode === '[12OD] 18:00 - 06:00') count12ODNight++;
       if (selectedCode.includes('[12O] 18:00 - 06:00')) count12ONight++;
+      if (
+        selectedCode.startsWith('[8CN]') ||
+        selectedCode.startsWith('[8O]') ||
+        selectedCode === '[8] 22:00 - 06:00'
+      ) {
+        countExtraMealShifts++;
+      }
 
       totalOTHours += (shiftObj.ot_day + shiftObj.ot_night);
       if (shiftObj.day_type !== 'T') {
@@ -1215,7 +1222,7 @@ function renderAll() {
   const item3 = nightHours * 0.3 * hourlyRate;
 
   // (4) Allowances
-  const mealAllow = (count12Night + count12ONight) * 30000;
+  const mealAllow = (count12Night + count12ONight + countExtraMealShifts) * 30000;
   const item4 = state.allowTravel + state.allowAttend + mealAllow + state.allowHoliday + state.allowPhone;
 
   // (5) Deductions
